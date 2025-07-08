@@ -8,7 +8,7 @@ export default function HomeScreen() {
       {/* Header */}
       <View style={styles.header}>
         <View>
-          <Text style={styles.greeting}>Hi, Sarah!</Text>
+          <Text style={styles.greeting}>Hi, Salomon!</Text>
           <Text style={styles.subtitle}>How are you feeling today?</Text>
         </View>
         <Image
@@ -41,15 +41,17 @@ export default function HomeScreen() {
           </Link>
         </View>
         <View style={styles.row}>
-          <FeatureCard
-            iconBg="#F3E6FF"
-            icon={require('../../assets/images/icon.png')}
-            title="AI Chatbot"
-            subtitle="Ask health questions"
-            onPress={() => {}}
-            fullWidth={false}
-          />
           <Link href="/chatbot" asChild>
+            <FeatureCard
+              iconBg="#F3E6FF"
+              icon={require('../../assets/images/icon.png')}
+              title="AI Chatbot"
+              subtitle="Ask health questions"
+              onPress={() => {}}
+              fullWidth={false}
+            />
+          </Link>
+          <Link href="/emergency" asChild>
             <FeatureCard
               iconBg="#FFE6E6"
               icon={require('../../assets/images/icon.png')}
@@ -61,14 +63,16 @@ export default function HomeScreen() {
           </Link>
         </View>
         <View style={styles.fullWidthCard}>
-          <FeatureCard
-            iconBg="linear-gradient(90deg, #377DFF 0%, #2CD283 100%)"
-            icon={require('../../assets/images/icon.png')}
-            title="First Aid Guide"
-            subtitle="Emergency procedures"
-            onPress={() => {}}
-            fullWidth
-          />
+          <Link href="/firstaid" asChild>
+            <FeatureCard
+              iconBg="linear-gradient(90deg, #377DFF 0%, #2CD283 100%)"
+              icon={require('../../assets/images/icon.png')}
+              title="First Aid Guide"
+              subtitle="Emergency procedures"
+              onPress={() => {}}
+              fullWidth
+            />
+          </Link>
         </View>
       </ScrollView>
     </View>

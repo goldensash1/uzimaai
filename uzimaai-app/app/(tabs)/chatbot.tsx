@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList, KeyboardAvoidingView, Platform, Image, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList, KeyboardAvoidingView, Platform, Image, SafeAreaView } from 'react-native';
+import * as Speech from 'expo-speech';
 
 const CHAT = [
   { id: '1', sender: 'bot', text: "Hello! I'm your medical assistant. I can help you with health information and guidance. How can I assist you today?", time: '9:42 AM' },
@@ -23,53 +24,66 @@ export default function ChatbotScreen() {
     }, 100);
   };
 
+  const speakMessage = (text: string) => {
+    Speech.speak(text, { language: 'en' });
+  };
+
   return (
-    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <View style={styles.container}>
-        <View style={styles.header}>
-          <Image source={require('../../assets/images/icon.png')} style={styles.avatarBot} />
-          <View style={{ flex: 1 }}>
-            <Text style={styles.headerTitle}>Medical Assistant</Text>
-            <Text style={styles.headerStatus}>Online</Text>
+    <SafeAreaView style={styles.safeArea}>
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+        <View style={styles.container}>
+          <View style={styles.header}>
+            <Image source={require('../../assets/images/icon.png')} style={styles.avatarBot} />
+            <View style={{ flex: 1 }}>
+              <Text style={styles.headerTitle}>Medical Assistant</Text>
+              <Text style={styles.headerStatus}>Online</Text>
+            </View>
+          </View>
+          <FlatList
+            ref={flatListRef}
+            data={messages}
+            keyExtractor={item => item.id}
+            renderItem={({ item }) => <ChatBubble message={item} onSpeak={speakMessage} />}
+            contentContainerStyle={{ paddingVertical: 16, paddingHorizontal: 8 }}
+            showsVerticalScrollIndicator={false}
+          />
+          <View style={styles.warningBox}>
+            <Text style={styles.warningText}>⚠️ This is not medical advice. Always consult a professional.</Text>
+          </View>
+          <View style={styles.inputRow}>
+            <TextInput
+              style={styles.input}
+              placeholder="Type your message..."
+              placeholderTextColor="#B0B8C1"
+              value={input}
+              onChangeText={setInput}
+              multiline
+            />
+            <TouchableOpacity style={styles.sendBtn} onPress={sendMessage}>
+              <Text style={styles.sendIcon}>➤</Text>
+            </TouchableOpacity>
           </View>
         </View>
-        <FlatList
-          ref={flatListRef}
-          data={messages}
-          keyExtractor={item => item.id}
-          renderItem={({ item }) => <ChatBubble message={item} />}
-          contentContainerStyle={{ paddingVertical: 16, paddingHorizontal: 8 }}
-          showsVerticalScrollIndicator={false}
-        />
-        <View style={styles.warningBox}>
-          <Text style={styles.warningText}>⚠️ This is not medical advice. Always consult a professional.</Text>
-        </View>
-        <View style={styles.inputRow}>
-          <TextInput
-            style={styles.input}
-            placeholder="Type your message..."
-            placeholderTextColor="#B0B8C1"
-            value={input}
-            onChangeText={setInput}
-            multiline
-          />
-          <TouchableOpacity style={styles.sendBtn} onPress={sendMessage}>
-            <Text style={styles.sendIcon}>➤</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
-function ChatBubble({ message }: { message: { sender: string; text: string; time: string } }) {
+function ChatBubble({ message, onSpeak }: { message: { sender: string; text: string; time: string }, onSpeak: (text: string) => void }) {
   const isUser = message.sender === 'user';
   return (
     <View style={[styles.bubbleRow, isUser && { justifyContent: 'flex-end' }]}>
       {!isUser && <Image source={require('../../assets/images/icon.png')} style={styles.avatarBotSmall} />}
       <View style={[styles.bubble, isUser ? styles.bubbleUser : styles.bubbleBot]}>
         <Text style={[styles.bubbleText, isUser && { color: '#fff' }]}>{message.text}</Text>
-        <Text style={styles.bubbleTime}>{message.time}</Text>
+        <View style={styles.bubbleFooter}>
+          <Text style={styles.bubbleTime}>{message.time}</Text>
+          {!isUser && (
+            <TouchableOpacity onPress={() => onSpeak(message.text)} style={styles.speakBtn}>
+              <Text style={styles.speakIcon}>🔊</Text>
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
       {isUser && <Image source={{ uri: 'https://randomuser.me/api/portraits/men/32.jpg' }} style={styles.avatarUserSmall} />}
     </View>
@@ -77,10 +91,14 @@ function ChatBubble({ message }: { message: { sender: string; text: string; time
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    paddingTop: 12,
+    paddingTop: 0,
   },
   header: {
     flexDirection: 'row',
@@ -144,11 +162,24 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#232B38',
   },
+  bubbleFooter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 4,
+    justifyContent: 'space-between',
+  },
   bubbleTime: {
     fontSize: 12,
     color: '#A0AEC0',
-    marginTop: 4,
     textAlign: 'right',
+  },
+  speakBtn: {
+    marginLeft: 8,
+    padding: 2,
+  },
+  speakIcon: {
+    fontSize: 18,
+    color: '#377DFF',
   },
   warningBox: {
     backgroundColor: '#FFF7E6',

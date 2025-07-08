@@ -91,6 +91,24 @@ export default function TabLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+        name="firstaid"
+        options={{
+          title: 'First Aid',
+          tabBarIcon: ({ color, focused }) => (
+            <FontAwesome name="heartbeat" size={26} color={color} style={{ marginBottom: -3 }} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: 'Profile',
+          tabBarIcon: ({ color, focused }) => (
+            <FontAwesome name="user" size={26} color={color} style={{ marginBottom: -3 }} />
+          ),
+        }}
+      />
       {/* Add more tabs here for Medicine, Chatbot, Profile, etc. */}
     </Tabs>
   );
