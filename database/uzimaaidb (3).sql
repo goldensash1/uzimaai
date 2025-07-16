@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Jul 16, 2025 at 11:17 AM
+-- Generation Time: Jul 16, 2025 at 11:50 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -34,6 +34,37 @@ CREATE TABLE `admin` (
   `adminUsername` varchar(100) DEFAULT NULL,
   `adminStatus` varchar(20) DEFAULT NULL,
   `adminPassword` varchar(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `medecineReviews`
+--
+
+CREATE TABLE `medecineReviews` (
+  `riviewId` int(11) NOT NULL,
+  `UserId` int(11) NOT NULL,
+  `ReviewMessage` text NOT NULL,
+  `rating` int(11) NOT NULL,
+  `reviewStatus` int(11) NOT NULL,
+  `reviewDate` varchar(100) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `medecines`
+--
+
+CREATE TABLE `medecines` (
+  `medicineId` int(11) NOT NULL,
+  `medicineName` varchar(255) NOT NULL,
+  `medicineUses` text NOT NULL,
+  `medicineSideEffects` text NOT NULL,
+  `medicineAlternatives` text NOT NULL,
+  `medicineStatus` int(11) NOT NULL,
+  `updatedDate` varchar(200) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
