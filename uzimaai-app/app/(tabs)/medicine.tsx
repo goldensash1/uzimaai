@@ -1,50 +1,46 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, FlatList, TouchableOpacity, Image } from 'react-native';
-
-const MEDICINES = [
-  {
-    id: '1',
-    name: 'Paracetamol',
-    uses: 'Pain relief, fever reduction, headaches',
-    sideEffects: 'Nausea, stomach upset (rare)',
-    alternatives: 'Ibuprofen, Aspirin',
-    reviews: [
-      { id: 'r1', user: 'Sarah M.', avatar: 'https://randomuser.me/api/portraits/women/44.jpg', rating: 4, text: 'Works great for headaches. No side effects experienced.' },
-      { id: 'r2', user: 'John D.', avatar: 'https://randomuser.me/api/portraits/men/32.jpg', rating: 5, text: 'Effective and safe. My go-to pain reliever.' },
-    ],
-  },
-  {
-    id: '2',
-    name: 'Ibuprofen',
-    uses: 'Anti-inflammatory, pain relief, fever reduction',
-    sideEffects: 'Stomach irritation, dizziness',
-    alternatives: 'Paracetamol, Naproxen',
-    reviews: [
-      { id: 'r3', user: 'Sarah M.', avatar: 'https://randomuser.me/api/portraits/women/44.jpg', rating: 4, text: 'No side effects. Helped with my pain.' },
-    ],
-  },
-];
-
-type Review = {
-  id: string;
-  user: string;
-  avatar: string;
-  rating: number;
-  text: string;
-};
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, TextInput, FlatList, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
+import { apiRequest } from '../../utils/api';
+import { API_ENDPOINTS } from '../../constants/api';
 
 type Medicine = {
-  id: string;
-  name: string;
-  uses: string;
-  sideEffects: string;
-  alternatives: string;
-  reviews: Review[];
+  medicineId: string;
+  medicineName: string;
+  medicineUses: string;
+  medicineSideEffects: string;
+  medicineAlternatives: string;
 };
 
 export default function MedicineScreen() {
   const [search, setSearch] = useState('');
-  const filtered = MEDICINES.filter(m => m.name.toLowerCase().includes(search.toLowerCase()));
+  const [medicines, setMedicines] = useState<Medicine[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    async function fetchMedicines() {
+      setLoading(true);
+      setError('');
+      try {
+        const res = await apiRequest(API_ENDPOINTS.medicines);
+        setMedicines(res.medicines);
+      } catch (e: any) {
+        setError(e.message || 'Failed to load medicines');
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchMedicines();
+  }, []);
+
+  const filtered = medicines.filter(m => m.medicineName.toLowerCase().includes(search.toLowerCase()));
+
+  if (loading) {
+    return <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}><ActivityIndicator size="large" color="#377DFF" /></View>;
+  }
+  if (error) {
+    return <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}><Text style={{ color: 'red' }}>{error}</Text></View>;
+  }
 
   return (
     <View style={styles.container}>
@@ -57,7 +53,7 @@ export default function MedicineScreen() {
       />
       <FlatList
         data={filtered}
-        keyExtractor={item => item.id}
+        keyExtractor={item => item.medicineId}
         renderItem={({ item }) => <MedicineCard medicine={item} />}
         contentContainerStyle={{ paddingBottom: 40 }}
         showsVerticalScrollIndicator={false}
@@ -71,30 +67,16 @@ function MedicineCard({ medicine }: { medicine: Medicine }) {
   return (
     <View style={styles.card}>
       <TouchableOpacity onPress={() => setExpanded(e => !e)}>
-        <Text style={styles.medicineName}>{medicine.name}</Text>
+        <Text style={styles.medicineName}>{medicine.medicineName}</Text>
         <Text style={styles.label}>Uses:</Text>
-        <Text style={styles.value}>{medicine.uses}</Text>
+        <Text style={styles.value}>{medicine.medicineUses}</Text>
         <Text style={styles.label}>Side Effects:</Text>
-        <Text style={styles.value}>{medicine.sideEffects}</Text>
+        <Text style={styles.value}>{medicine.medicineSideEffects}</Text>
         <Text style={styles.label}>Alternatives:</Text>
-        <Text style={styles.value}>{medicine.alternatives}</Text>
+        <Text style={styles.value}>{medicine.medicineAlternatives}</Text>
         <Text style={styles.detailsBtn}>{expanded ? 'Hide Details' : 'View Details'}</Text>
       </TouchableOpacity>
-      {expanded && (
-        <View style={styles.reviewsSection}>
-          <Text style={styles.reviewsTitle}>User Reviews</Text>
-          {medicine.reviews.map((r: Review) => (
-            <View key={r.id} style={styles.reviewRow}>
-              <Image source={{ uri: r.avatar }} style={styles.avatar} />
-              <View style={{ flex: 1 }}>
-                <Text style={styles.reviewUser}>{r.user}</Text>
-                <Text style={styles.reviewText}>{r.text}</Text>
-              </View>
-              <Text style={styles.stars}>{'★'.repeat(r.rating)}{'☆'.repeat(5 - r.rating)}</Text>
-            </View>
-          ))}
-        </View>
-      )}
+      {/* Reviews can be fetched and displayed here if needed */}
     </View>
   );
 }

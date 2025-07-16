@@ -1,31 +1,45 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image, ScrollView, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image, ScrollView, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { API_ENDPOINTS } from '../constants/api';
 import { apiRequest } from '../utils/api';
 import { saveSession } from '../utils/session';
 
-export default function LoginScreen() {
-  const [email, setEmail] = useState('');
+export default function RegisterScreen() {
+  const [username, setUsername] = useState('');
+  const [useremail, setUseremail] = useState('');
+  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
+  const [confirm, setConfirm] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
 
-  const handleLogin = async () => {
-    setLoading(true);
+  const handleRegister = async () => {
     setError('');
+    if (!username || !useremail || !phone || !password || !confirm) {
+      setError('All fields are required');
+      return;
+    }
+    if (password !== confirm) {
+      setError('Passwords do not match');
+      return;
+    }
+    setLoading(true);
     try {
-      const data = await apiRequest(API_ENDPOINTS.login, 'POST', {
-        identifier: email,
+      const data = await apiRequest(API_ENDPOINTS.register, 'POST', {
+        username,
+        useremail,
+        phone,
         password,
       });
-      await saveSession(data.user);
+      // Auto-login after registration
+      await saveSession({ userid: data.userid, username, useremail, phone });
       setLoading(false);
-      router.replace('/(tabs)'); // Go to main app
+      router.replace('/(tabs)');
     } catch (e: any) {
       setLoading(false);
-      setError(e.message || 'Login failed');
+      setError(e.message || 'Registration failed');
     }
   };
 
@@ -33,17 +47,33 @@ export default function LoginScreen() {
     <ScrollView style={styles.container} contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }} showsVerticalScrollIndicator={false}>
       <View style={styles.centered}>
         <Image source={require('../assets/images/icon.png')} style={styles.logo} />
-        <Text style={styles.title}>Welcome Back</Text>
-        <Text style={styles.subtitle}>Sign in to your health account</Text>
+        <Text style={styles.title}>Create Account</Text>
+        <Text style={styles.subtitle}>Sign up to get started</Text>
         <View style={styles.inputBox}>
           <TextInput
             style={styles.input}
-            placeholder="Email or Phone Number"
+            placeholder="Username"
             placeholderTextColor="#A0AEC0"
-            value={email}
-            onChangeText={setEmail}
+            value={username}
+            onChangeText={setUsername}
+            autoCapitalize="words"
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Email"
+            placeholderTextColor="#A0AEC0"
+            value={useremail}
+            onChangeText={setUseremail}
             keyboardType="email-address"
             autoCapitalize="none"
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Phone Number"
+            placeholderTextColor="#A0AEC0"
+            value={phone}
+            onChangeText={setPhone}
+            keyboardType="phone-pad"
           />
           <TextInput
             style={styles.input}
@@ -53,13 +83,18 @@ export default function LoginScreen() {
             onChangeText={setPassword}
             secureTextEntry
           />
+          <TextInput
+            style={styles.input}
+            placeholder="Confirm Password"
+            placeholderTextColor="#A0AEC0"
+            value={confirm}
+            onChangeText={setConfirm}
+            secureTextEntry
+          />
         </View>
         {error ? <Text style={{ color: 'red', marginBottom: 8 }}>{error}</Text> : null}
-        <TouchableOpacity style={styles.loginBtn} onPress={handleLogin} disabled={loading}>
-          {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.loginBtnText}>Login</Text>}
-        </TouchableOpacity>
-        <TouchableOpacity>
-          <Text style={styles.forgot}>Forgot Password?</Text>
+        <TouchableOpacity style={styles.registerBtn} onPress={handleRegister} disabled={loading}>
+          {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.registerBtnText}>Register</Text>}
         </TouchableOpacity>
         <View style={styles.orRow}>
           <View style={styles.orLine} />
@@ -79,7 +114,7 @@ export default function LoginScreen() {
           </TouchableOpacity>
         </View>
         <Text style={styles.signupText}>
-          Don't have an account? <Text style={styles.signupLink} onPress={() => router.replace('/register')}>Sign Up</Text>
+          Already have an account? <Text style={styles.signupLink} onPress={() => router.replace('/login')}>Login</Text>
         </Text>
       </View>
     </ScrollView>
@@ -128,29 +163,32 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#E2E8F0',
   },
-  loginBtn: {
-    backgroundColor: '#377DFF',
+  registerBtn: {
+    backgroundColor: '#2CD283',
     borderRadius: 12,
     paddingVertical: 16,
     alignItems: 'center',
     width: '100%',
     marginBottom: 12,
-    shadowColor: '#377DFF',
+    shadowColor: '#2CD283',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.15,
     shadowRadius: 8,
     elevation: 2,
   },
-  loginBtnText: {
+  registerBtnText: {
     color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
   },
-  forgot: {
+  loginText: {
+    marginTop: 18,
+    color: '#7B8CA6',
+    fontSize: 15,
+  },
+  loginLink: {
     color: '#377DFF',
     fontWeight: 'bold',
-    fontSize: 15,
-    marginBottom: 18,
   },
   orRow: {
     flexDirection: 'row',

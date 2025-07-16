@@ -7,6 +7,8 @@ import { useEffect, useState } from 'react';
 import 'react-native-reanimated';
 
 import { useColorScheme } from '@/components/useColorScheme';
+import { getSession } from '../utils/session';
+import { useRouter, usePathname } from 'expo-router';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -24,8 +26,11 @@ export default function RootLayout() {
     ...FontAwesome.font,
   });
   const [showSplash, setShowSplash] = useState(true);
+  const [checkingAuth, setCheckingAuth] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const router = useRouter();
+  const pathname = usePathname();
 
-  // Expo Router uses Error Boundaries to catch errors in the navigation tree.
   useEffect(() => {
     if (error) throw error;
   }, [error]);
@@ -37,12 +42,38 @@ export default function RootLayout() {
     }
   }, [loaded]);
 
+  useEffect(() => {
+    async function checkAuth() {
+      const session = await getSession();
+      setIsLoggedIn(!!session);
+      setCheckingAuth(false);
+      // If on /login and already logged in, redirect to main app
+      if (session && pathname === '/login') {
+        router.replace('/(tabs)');
+      }
+    }
+    if (!showSplash && loaded) {
+      checkAuth();
+    }
+  }, [showSplash, loaded, pathname]);
+
+  useEffect(() => {
+    if (!isLoggedIn && !checkingAuth && pathname !== '/login' && pathname !== '/register') {
+      router.replace('/login');
+    }
+  }, [isLoggedIn, checkingAuth, pathname, router]);
+
   if (!loaded) {
     return null;
   }
-
   if (showSplash) {
     return <SplashScreen />;
+  }
+  if (checkingAuth) {
+    return null;
+  }
+  if (!isLoggedIn && pathname !== '/login' && pathname !== '/register') {
+    return null; // Prevent rendering until navigation completes
   }
   return <RootLayoutNav />;
 }
@@ -55,6 +86,8 @@ function RootLayoutNav() {
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
+        <Stack.Screen name="login" options={{ headerShown: false }} />
+        <Stack.Screen name="register" options={{ headerShown: false }} />
       </Stack>
     </ThemeProvider>
   );

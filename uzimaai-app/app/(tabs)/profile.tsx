@@ -1,16 +1,9 @@
-import React from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView } from 'react-native';
-
-const USER = {
-  name: 'Salomon Masasu',
-  email: 'salomon.masasu@email.com',
-  avatar: 'https://randomuser.me/api/portraits/men/32.jpg',
-  stats: [
-    { label: 'Symptoms', value: 24, color: '#377DFF' },
-    { label: 'Reviews', value: 12, color: '#2CD283' },
-    { label: 'Reports', value: 8, color: '#8B5CF6' },
-  ],
-};
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Alert, ActivityIndicator, Modal, TextInput } from 'react-native';
+import { clearSession, getSession } from '../../utils/session';
+import { useRouter } from 'expo-router';
+import { apiRequest } from '../../utils/api';
+import { API_ENDPOINTS } from '../../constants/api';
 
 const ACCOUNT = [
   { icon: '👤', label: 'Edit Profile' },
@@ -25,37 +18,152 @@ const APP = [
 ];
 
 export default function ProfileScreen() {
+  const router = useRouter();
+  const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [editVisible, setEditVisible] = useState(false);
+  const [editData, setEditData] = useState<any>({});
+  const [editLoading, setEditLoading] = useState(false);
+  const [editError, setEditError] = useState('');
+
+  useEffect(() => {
+    fetchProfile();
+  }, []);
+
+  async function fetchProfile() {
+    setLoading(true);
+    setError('');
+    try {
+      const session = await getSession();
+      if (!session?.userid) throw new Error('No user session');
+      const res = await apiRequest(`${API_ENDPOINTS.profile}?userid=${session.userid}`);
+      setUser(res.user);
+    } catch (e: any) {
+      setError(e.message || 'Failed to load profile');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const handleAction = async (label: string) => {
+    if (label === 'Log Out') {
+      await clearSession();
+      router.replace('/login');
+    } else if (label === 'Edit Profile') {
+      setEditData({
+        ...user,
+        emergencyphone: user?.emergencyphone || '',
+      });
+      setEditError('');
+      setEditVisible(true);
+    } else {
+      Alert.alert(label, 'This feature is coming soon.');
+    }
+  };
+
+  const handleEditSave = async () => {
+    setEditLoading(true);
+    setEditError('');
+    try {
+      await apiRequest(API_ENDPOINTS.updateProfile, 'POST', {
+        userid: user.userid,
+        username: editData.username,
+        useremail: editData.useremail,
+        phone: editData.phone,
+        emergencyphone: editData.emergencyphone,
+      });
+      setEditVisible(false);
+      fetchProfile();
+    } catch (e: any) {
+      setEditError(e.message || 'Failed to update profile');
+    } finally {
+      setEditLoading(false);
+    }
+  };
+
+  if (loading) {
+    return <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}><ActivityIndicator size="large" color="#377DFF" /></View>;
+  }
+  if (error) {
+    return <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}><Text style={{ color: 'red' }}>{error}</Text></View>;
+  }
+
   return (
-    <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 40 }} showsVerticalScrollIndicator={false}>
-      <View style={styles.header}>
-        <Image source={{ uri: USER.avatar }} style={styles.avatar} />
-        <Text style={styles.name}>{USER.name}</Text>
-        <Text style={styles.email}>{USER.email}</Text>
-        <View style={styles.statsRow}>
-          {USER.stats.map(stat => (
-            <View key={stat.label} style={styles.statBox}>
-              <Text style={[styles.statValue, { color: stat.color }]}>{stat.value}</Text>
-              <Text style={styles.statLabel}>{stat.label}</Text>
-            </View>
-          ))}
+    <>
+      <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 40 }} showsVerticalScrollIndicator={false}>
+        <View style={styles.header}>
+          <Image source={{ uri: user?.avatar || 'https://randomuser.me/api/portraits/men/32.jpg' }} style={styles.avatar} />
+          <Text style={styles.name}>{user?.username || ''}</Text>
+          <Text style={styles.email}>{user?.useremail || ''}</Text>
+          <View style={styles.statsRow}>
+            {/* Placeholder stats, replace with real data if available */}
+            <View style={styles.statBox}><Text style={[styles.statValue, { color: '#377DFF' }]}>0</Text><Text style={styles.statLabel}>Symptoms</Text></View>
+            <View style={styles.statBox}><Text style={[styles.statValue, { color: '#2CD283' }]}>0</Text><Text style={styles.statLabel}>Reviews</Text></View>
+            <View style={styles.statBox}><Text style={[styles.statValue, { color: '#8B5CF6' }]}>0</Text><Text style={styles.statLabel}>Reports</Text></View>
+          </View>
         </View>
-      </View>
-      <Section title="Account">
-        {ACCOUNT.map(item => (
-          <ProfileAction key={item.label} icon={item.icon} label={item.label} />
-        ))}
-      </Section>
-      <Section title="Health Data">
-        {HEALTH.map(item => (
-          <ProfileAction key={item.label} icon={item.icon} label={item.label} />
-        ))}
-      </Section>
-      <Section title="App">
-        {APP.map(item => (
-          <ProfileAction key={item.label} icon={item.icon} label={item.label} color={item.color} />
-        ))}
-      </Section>
-    </ScrollView>
+        <Section title="Account">
+          {ACCOUNT.map(item => (
+            <ProfileAction key={item.label} icon={item.icon} label={item.label} onPress={handleAction} />
+          ))}
+        </Section>
+        <Section title="Health Data">
+          {HEALTH.map(item => (
+            <ProfileAction key={item.label} icon={item.icon} label={item.label} onPress={handleAction} />
+          ))}
+        </Section>
+        <Section title="App">
+          {APP.map(item => (
+            <ProfileAction key={item.label} icon={item.icon} label={item.label} color={item.color} onPress={handleAction} />
+          ))}
+        </Section>
+      </ScrollView>
+      <Modal visible={editVisible} animationType="slide" transparent>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Edit Profile</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Username"
+              value={editData.username}
+              onChangeText={v => setEditData((d: any) => ({ ...d, username: v }))}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Email"
+              value={editData.useremail}
+              onChangeText={v => setEditData((d: any) => ({ ...d, useremail: v }))}
+              keyboardType="email-address"
+              autoCapitalize="none"
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Phone"
+              value={editData.phone}
+              onChangeText={v => setEditData((d: any) => ({ ...d, phone: v }))}
+              keyboardType="phone-pad"
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Emergency Phone"
+              value={editData.emergencyphone}
+              onChangeText={v => setEditData((d: any) => ({ ...d, emergencyphone: v }))}
+              keyboardType="phone-pad"
+            />
+            {editError ? <Text style={{ color: 'red', marginBottom: 8 }}>{editError}</Text> : null}
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 12 }}>
+              <TouchableOpacity style={[styles.modalBtn, { backgroundColor: '#A0AEC0' }]} onPress={() => setEditVisible(false)} disabled={editLoading}>
+                <Text style={{ color: '#fff', fontWeight: 'bold' }}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.modalBtn, { backgroundColor: '#377DFF' }]} onPress={handleEditSave} disabled={editLoading}>
+                {editLoading ? <ActivityIndicator color="#fff" /> : <Text style={{ color: '#fff', fontWeight: 'bold' }}>Save</Text>}
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+    </>
   );
 }
 
@@ -68,9 +176,9 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   );
 }
 
-function ProfileAction({ icon, label, color }: { icon: string; label: string; color?: string }) {
+function ProfileAction({ icon, label, color, onPress }: { icon: string; label: string; color?: string; onPress: (label: string) => void }) {
   return (
-    <TouchableOpacity style={styles.actionRow}>
+    <TouchableOpacity style={styles.actionRow} onPress={() => onPress(label)}>
       <Text style={styles.actionIcon}>{icon}</Text>
       <Text style={[styles.actionLabel, color && { color }]}>{label}</Text>
       <Text style={styles.actionArrow}>›</Text>
@@ -155,5 +263,42 @@ const styles = StyleSheet.create({
     fontSize: 22,
     color: '#A0AEC0',
     marginLeft: 8,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 24,
+    width: '90%',
+    elevation: 8,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 16,
+    color: '#232B38',
+    textAlign: 'center',
+  },
+  input: {
+    backgroundColor: '#F5F7FA',
+    borderRadius: 12,
+    padding: 14,
+    fontSize: 16,
+    color: '#232B38',
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+  },
+  modalBtn: {
+    flex: 1,
+    alignItems: 'center',
+    padding: 14,
+    borderRadius: 10,
+    marginHorizontal: 6,
   },
 }); 
