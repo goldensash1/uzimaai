@@ -1,5 +1,5 @@
 import React from 'react';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { Ionicons, MaterialIcons, FontAwesome } from '@expo/vector-icons';
 import { Link, Tabs } from 'expo-router';
 import { Pressable } from 'react-native';
 
@@ -24,7 +24,7 @@ export default function TabLayout() {
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
         tabBarInactiveTintColor: '#A0AEC0',
         tabBarStyle: {
-          height: 70,
+          height: 60,
           borderTopLeftRadius: 24,
           borderTopRightRadius: 24,
           position: 'absolute',
@@ -39,35 +39,28 @@ export default function TabLayout() {
           shadowRadius: 8,
         },
         headerShown: false,
-        tabBarLabelStyle: {
-          fontSize: 13,
-          fontWeight: '600',
-          marginBottom: 6,
-        },
+        tabBarShowLabel: false,
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
           tabBarIcon: ({ color, focused }) => (
-            <FontAwesome name="home" size={26} color={color} style={{ marginBottom: -3 }} />
+            <Ionicons name="home" size={26} color={color} style={{ marginBottom: -3 }} />
           ),
         }}
       />
       <Tabs.Screen
         name="two"
         options={{
-          title: 'Symptoms',
           tabBarIcon: ({ color, focused }) => (
-            <FontAwesome name="stethoscope" size={26} color={color} style={{ marginBottom: -3 }} />
+            <MaterialIcons name="sick" size={26} color={color} style={{ marginBottom: -3 }} />
           ),
         }}
       />
       <Tabs.Screen
         name="medicine"
         options={{
-          title: 'Medicine',
           tabBarIcon: ({ color, focused }) => (
             <FontAwesome name="medkit" size={26} color={color} style={{ marginBottom: -3 }} />
           ),
@@ -76,40 +69,35 @@ export default function TabLayout() {
       <Tabs.Screen
         name="chatbot"
         options={{
-          title: 'Chatbot',
           tabBarIcon: ({ color, focused }) => (
-            <FontAwesome name="comment" size={28} color={color} style={{ marginBottom: -3 }} />
+            <Ionicons name="chatbubble-ellipses" size={28} color={color} style={{ marginBottom: -3 }} />
           ),
         }}
       />
       <Tabs.Screen
         name="emergency"
         options={{
-          title: 'Emergency',
           tabBarIcon: ({ color, focused }) => (
-            <FontAwesome name="phone" size={26} color={color} style={{ marginBottom: -3 }} />
+            <Ionicons name="call" size={26} color={color} style={{ marginBottom: -3 }} />
           ),
         }}
       />
       <Tabs.Screen
         name="firstaid"
         options={{
-          title: 'First Aid',
           tabBarIcon: ({ color, focused }) => (
-            <FontAwesome name="heartbeat" size={26} color={color} style={{ marginBottom: -3 }} />
+            <MaterialIcons name="health-and-safety" size={26} color={color} style={{ marginBottom: -3 }} />
           ),
         }}
       />
       <Tabs.Screen
         name="profile"
         options={{
-          title: 'Profile',
           tabBarIcon: ({ color, focused }) => (
             <FontAwesome name="user" size={26} color={color} style={{ marginBottom: -3 }} />
           ),
         }}
       />
-      {/* Add more tabs here for Medicine, Chatbot, Profile, etc. */}
     </Tabs>
   );
 }

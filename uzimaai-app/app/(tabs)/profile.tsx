@@ -4,17 +4,18 @@ import { clearSession, getSession } from '../../utils/session';
 import { useRouter } from 'expo-router';
 import { apiRequest } from '../../utils/api';
 import { API_ENDPOINTS } from '../../constants/api';
+import { FontAwesome, MaterialIcons, Ionicons, Feather } from '@expo/vector-icons';
 
 const ACCOUNT = [
-  { icon: '👤', label: 'Edit Profile' },
-  { icon: '🔒', label: 'Change Password' },
+  { icon: <FontAwesome name="user" size={22} color="#377DFF" />, label: 'Edit Profile' },
+  { icon: <Feather name="lock" size={22} color="#7B8CA6" />, label: 'Change Password' },
 ];
 const HEALTH = [
-  { icon: '📈', label: 'Symptom History' },
+  { icon: <MaterialIcons name="history" size={22} color="#2CD283" />, label: 'Symptom History' },
 ];
 const APP = [
-  { icon: '⚙️', label: 'App Settings' },
-  { icon: '🚪', label: 'Log Out', color: '#E53935' },
+  { icon: <Ionicons name="settings-outline" size={22} color="#8B5CF6" />, label: 'App Settings' },
+  { icon: <MaterialIcons name="logout" size={22} color="#E53935" />, label: 'Log Out', color: '#E53935' },
 ];
 
 export default function ProfileScreen() {
@@ -93,7 +94,7 @@ export default function ProfileScreen() {
     <>
       <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 40 }} showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
-          <Image source={{ uri: user?.avatar || 'https://randomuser.me/api/portraits/men/32.jpg' }} style={styles.avatar} />
+          <FontAwesome name="user-circle" size={84} color="#377DFF" style={styles.profileIcon} />
           <Text style={styles.name}>{user?.username || ''}</Text>
           <Text style={styles.email}>{user?.useremail || ''}</Text>
           <View style={styles.statsRow}>
@@ -176,10 +177,10 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   );
 }
 
-function ProfileAction({ icon, label, color, onPress }: { icon: string; label: string; color?: string; onPress: (label: string) => void }) {
+function ProfileAction({ icon, label, color, onPress }: { icon: React.ReactNode; label: string; color?: string; onPress: (label: string) => void }) {
   return (
     <TouchableOpacity style={styles.actionRow} onPress={() => onPress(label)}>
-      <Text style={styles.actionIcon}>{icon}</Text>
+      <View style={styles.actionIconBox}>{icon}</View>
       <Text style={[styles.actionLabel, color && { color }]}>{label}</Text>
       <Text style={styles.actionArrow}>›</Text>
     </TouchableOpacity>
@@ -251,8 +252,15 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   actionIcon: {
-    fontSize: 22,
-    marginRight: 16,
+    fontSize: 20,
+    marginRight: 14,
+  },
+  actionIconBox: {
+    marginRight: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 28,
+    height: 28,
   },
   actionLabel: {
     fontSize: 16,
@@ -300,5 +308,9 @@ const styles = StyleSheet.create({
     padding: 14,
     borderRadius: 10,
     marginHorizontal: 6,
+  },
+  profileIcon: {
+    marginBottom: 12,
+    alignSelf: 'center',
   },
 }); 

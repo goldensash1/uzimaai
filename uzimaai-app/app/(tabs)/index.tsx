@@ -1,28 +1,36 @@
-import React from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { Link } from 'expo-router';
+import { FontAwesome, MaterialIcons, Ionicons } from '@expo/vector-icons';
+import { getSession } from '../../utils/session';
 
 export default function HomeScreen() {
+  const [username, setUsername] = useState('');
+  useEffect(() => {
+    (async () => {
+      const session = await getSession();
+      setUsername(session?.username || '');
+    })();
+  }, []);
   return (
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
         <View>
-          <Text style={styles.greeting}>Hi, Salomon!</Text>
+          <Text style={styles.greeting}>Hi{username ? `, ${username}!` : '!'}</Text>
           <Text style={styles.subtitle}>How are you feeling today?</Text>
         </View>
-        <Image
-          source={{ uri: 'https://randomuser.me/api/portraits/women/44.jpg' }}
-          style={styles.profileImage}
-        />
+        <View style={styles.profileIconBox}>
+          <FontAwesome name="user-circle" size={48} color="#377DFF" />
+        </View>
       </View>
       {/* Feature Cards */}
       <ScrollView contentContainerStyle={styles.cardsContainer} showsVerticalScrollIndicator={false}>
         <View style={styles.row}>
           <Link href="/two" asChild>
             <FeatureCard
+              icon={<MaterialIcons name="sick" size={32} color="#377DFF" />}
               iconBg="#E6F0FF"
-              icon={require('../../assets/images/icon.png')}
               title="Symptom Checker"
               subtitle="Check your symptoms"
               onPress={() => {}}
@@ -31,8 +39,8 @@ export default function HomeScreen() {
           </Link>
           <Link href="/medicine" asChild>
             <FeatureCard
+              icon={<FontAwesome name="medkit" size={32} color="#2CD283" />}
               iconBg="#E6FFF5"
-              icon={require('../../assets/images/icon.png')}
               title="Medicine Reviews"
               subtitle="Find medicine info"
               onPress={() => {}}
@@ -43,8 +51,8 @@ export default function HomeScreen() {
         <View style={styles.row}>
           <Link href="/chatbot" asChild>
             <FeatureCard
+              icon={<Ionicons name="chatbubble-ellipses" size={32} color="#8B5CF6" />}
               iconBg="#F3E6FF"
-              icon={require('../../assets/images/icon.png')}
               title="AI Chatbot"
               subtitle="Ask health questions"
               onPress={() => {}}
@@ -53,8 +61,8 @@ export default function HomeScreen() {
           </Link>
           <Link href="/emergency" asChild>
             <FeatureCard
+              icon={<Ionicons name="call" size={32} color="#E53935" />}
               iconBg="#FFE6E6"
-              icon={require('../../assets/images/icon.png')}
               title="Emergency Contact"
               subtitle="Quick emergency call"
               onPress={() => {}}
@@ -65,8 +73,8 @@ export default function HomeScreen() {
         <View style={styles.fullWidthCard}>
           <Link href="/firstaid" asChild>
             <FeatureCard
+              icon={<MaterialIcons name="health-and-safety" size={32} color="#377DFF" />}
               iconBg="linear-gradient(90deg, #377DFF 0%, #2CD283 100%)"
-              icon={require('../../assets/images/icon.png')}
               title="First Aid Guide"
               subtitle="Emergency procedures"
               onPress={() => {}}
@@ -80,7 +88,7 @@ export default function HomeScreen() {
 }
 
 function FeatureCard({ icon, iconBg, title, subtitle, onPress, fullWidth = false }: {
-  icon: any;
+  icon: React.ReactNode;
   iconBg: string;
   title: string;
   subtitle: string;
@@ -91,14 +99,14 @@ function FeatureCard({ icon, iconBg, title, subtitle, onPress, fullWidth = false
     <TouchableOpacity
       style={[styles.card, fullWidth && styles.cardFullWidth]}
       onPress={onPress}
-      activeOpacity={0.8}
+      activeOpacity={0.85}
     >
       <View style={[styles.iconContainer, { backgroundColor: iconBg.includes('linear') ? '#377DFF' : iconBg }]}> 
-        <Image source={icon} style={styles.icon} />
+        {icon}
       </View>
-      <View>
-        <Text style={styles.cardTitle}>{title}</Text>
-        <Text style={styles.cardSubtitle}>{subtitle}</Text>
+      <View style={{ flex: 1 }}>
+        <Text style={styles.cardTitle} numberOfLines={1} ellipsizeMode="tail">{title}</Text>
+        <Text style={styles.cardSubtitle} numberOfLines={2} ellipsizeMode="tail">{subtitle}</Text>
       </View>
     </TouchableOpacity>
   );
@@ -139,6 +147,19 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 4,
   },
+  profileIconBox: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#E6F0FF',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 4,
+  },
   cardsContainer: {
     paddingBottom: 40,
   },
@@ -146,6 +167,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 20,
+  },
+  emoji: {
+    fontSize: 36,
+    marginBottom: 0,
+    textAlign: 'center',
   },
   card: {
     backgroundColor: '#fff',
@@ -160,6 +186,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.06,
     shadowRadius: 8,
     elevation: 2,
+    minHeight: 80,
   },
   cardFullWidth: {
     width: '100%',
@@ -167,27 +194,25 @@ const styles = StyleSheet.create({
     marginBottom: 0,
   },
   iconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 16,
+    width: 56,
+    height: 56,
+    borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 16,
-  },
-  icon: {
-    width: 28,
-    height: 28,
-    resizeMode: 'contain',
   },
   cardTitle: {
     fontSize: 17,
     fontWeight: 'bold',
     color: '#232B38',
+    marginBottom: 2,
   },
   cardSubtitle: {
     fontSize: 14,
     color: '#7B8CA6',
-    marginTop: 2,
+    marginTop: 0,
+    flexShrink: 1,
+    flexWrap: 'wrap',
   },
   fullWidthCard: {
     marginTop: 8,

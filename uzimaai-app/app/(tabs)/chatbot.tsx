@@ -1,6 +1,8 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList, KeyboardAvoidingView, Platform, Image, SafeAreaView } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList, KeyboardAvoidingView, Platform, Image } from 'react-native';
 import * as Speech from 'expo-speech';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 
 const CHAT = [
   { id: '1', sender: 'bot', text: "Hello! I'm your medical assistant. I can help you with health information and guidance. How can I assist you today?", time: '9:42 AM' },
@@ -30,10 +32,14 @@ export default function ChatbotScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 60}
+      >
         <View style={styles.container}>
           <View style={styles.header}>
-            <Image source={require('../../assets/images/icon.png')} style={styles.avatarBot} />
+            <Image source={require('../../assets/images/icon.png')} style={styles.avatarBot} resizeMode="contain" />
             <View style={{ flex: 1 }}>
               <Text style={styles.headerTitle}>Medical Assistant</Text>
               <Text style={styles.headerStatus}>Online</Text>
@@ -73,19 +79,19 @@ function ChatBubble({ message, onSpeak }: { message: { sender: string; text: str
   const isUser = message.sender === 'user';
   return (
     <View style={[styles.bubbleRow, isUser && { justifyContent: 'flex-end' }]}>
-      {!isUser && <Image source={require('../../assets/images/icon.png')} style={styles.avatarBotSmall} />}
+      {!isUser && <Image source={require('../../assets/images/icon.png')} style={styles.avatarBotSmall} resizeMode="contain" />}
       <View style={[styles.bubble, isUser ? styles.bubbleUser : styles.bubbleBot]}>
         <Text style={[styles.bubbleText, isUser && { color: '#fff' }]}>{message.text}</Text>
         <View style={styles.bubbleFooter}>
           <Text style={styles.bubbleTime}>{message.time}</Text>
           {!isUser && (
             <TouchableOpacity onPress={() => onSpeak(message.text)} style={styles.speakBtn}>
-              <Text style={styles.speakIcon}>🔊</Text>
+              <Ionicons name="volume-high" size={20} color="#377DFF" style={styles.speakIcon} />
             </TouchableOpacity>
           )}
         </View>
       </View>
-      {isUser && <Image source={{ uri: 'https://randomuser.me/api/portraits/men/32.jpg' }} style={styles.avatarUserSmall} />}
+      {isUser && <Image source={{ uri: 'https://randomuser.me/api/portraits/men/32.jpg' }} style={styles.avatarUserSmall} resizeMode="contain" />}
     </View>
   );
 }
@@ -94,20 +100,24 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: '#fff',
+    paddingTop: 0,
+    paddingBottom: 0,
   },
   container: {
     flex: 1,
     backgroundColor: '#fff',
     paddingTop: 0,
+    paddingBottom: 0,
+    justifyContent: 'flex-end',
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingBottom: 8,
+    paddingHorizontal: 12,
+    paddingBottom: 4,
     borderBottomWidth: 1,
     borderBottomColor: '#E2E8F0',
-    marginBottom: 4,
+    marginBottom: 2,
   },
   headerTitle: {
     fontSize: 18,
@@ -124,6 +134,7 @@ const styles = StyleSheet.create({
     height: 40,
     borderRadius: 20,
     marginRight: 12,
+    backgroundColor: '#fff',
   },
   avatarBotSmall: {
     width: 28,
@@ -131,6 +142,7 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     marginRight: 8,
     alignSelf: 'flex-end',
+    backgroundColor: '#fff',
   },
   avatarUserSmall: {
     width: 28,
@@ -138,6 +150,7 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     marginLeft: 8,
     alignSelf: 'flex-end',
+    backgroundColor: '#fff',
   },
   bubbleRow: {
     flexDirection: 'row',
@@ -145,10 +158,13 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   bubble: {
-    maxWidth: '75%',
-    padding: 12,
-    borderRadius: 16,
-    marginBottom: 2,
+    maxWidth: '85%',
+    paddingVertical: 8,
+    paddingHorizontal: 10,
+    borderRadius: 14,
+    marginBottom: 1,
+    flexShrink: 1,
+    flexWrap: 'wrap',
   },
   bubbleBot: {
     backgroundColor: '#F5F7FA',
@@ -159,8 +175,10 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 0,
   },
   bubbleText: {
-    fontSize: 16,
+    fontSize: 15,
     color: '#232B38',
+    flexWrap: 'wrap',
+    maxWidth: '100%',
   },
   bubbleFooter: {
     flexDirection: 'row',
@@ -178,7 +196,7 @@ const styles = StyleSheet.create({
     padding: 2,
   },
   speakIcon: {
-    fontSize: 18,
+    fontSize: 20,
     color: '#377DFF',
   },
   warningBox: {
@@ -198,17 +216,18 @@ const styles = StyleSheet.create({
   inputRow: {
     flexDirection: 'row',
     alignItems: 'flex-end',
-    paddingHorizontal: 12,
-    paddingBottom: 16,
+    paddingHorizontal: 8,
+    paddingBottom: 8,
     backgroundColor: '#fff',
+    minHeight: 56,
   },
   input: {
     flex: 1,
     backgroundColor: '#F5F7FA',
     borderRadius: 24,
-    paddingHorizontal: 18,
-    paddingVertical: 12,
-    fontSize: 16,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    fontSize: 15,
     color: '#232B38',
     borderWidth: 1,
     borderColor: '#E2E8F0',
