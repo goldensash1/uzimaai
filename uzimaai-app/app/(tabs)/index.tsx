@@ -73,7 +73,7 @@ export default function HomeScreen() {
         <View style={styles.fullWidthCard}>
           <Link href="/firstaid" asChild>
             <FeatureCard
-              icon={<MaterialIcons name="health-and-safety" size={32} color="#377DFF" />}
+              icon={<Ionicons name="medkit" size={32} color="#fff" />}
               iconBg="linear-gradient(90deg, #377DFF 0%, #2CD283 100%)"
               title="First Aid Guide"
               subtitle="Emergency procedures"
