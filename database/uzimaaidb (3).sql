@@ -83,7 +83,7 @@ CREATE TABLE `searchHistory` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `userContext`
+-- Table structure for table `serContext`
 --
 
 CREATE TABLE `userContext` (
