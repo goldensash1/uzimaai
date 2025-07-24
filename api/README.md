@@ -129,7 +129,34 @@ http://localhost/uzimaai/api/endpoints
 
 ---
 
-## 5. Chat (User Context)
+## 5. AI Chat
+
+### AI Chat (Symptom Checker & Medical Assistant)
+- **POST** `/ai_chat.php`
+- **Body (JSON):**
+  ```json
+  {
+    "message": "string",
+    "userid": 1,
+    "type": "chat" // or "symptom"
+  }
+  ```
+- **Success Response:**
+  ```json
+  {
+    "success": true,
+    "message": "user message",
+    "response": "AI response",
+    "timestamp": "2024-01-01 12:00:00",
+    "type": "chat"
+  }
+  ```
+- **Error Responses:**
+  - 400: `{ "error": "Message is required" }`
+  - 400: `{ "error": "User ID is required" }`
+  - 500: `{ "error": "API error" }`
+
+## 6. Chat (User Context)
 
 ### Send Message
 - **POST** `/send_message.php`
@@ -159,7 +186,7 @@ http://localhost/uzimaai/api/endpoints
 
 ---
 
-## 6. Search History
+## 7. Search History
 
 ### Get Search History
 - **GET** `/get_search_history.php?userid=1`
@@ -172,7 +199,7 @@ http://localhost/uzimaai/api/endpoints
 
 ---
 
-## 7. Emergency Contacts
+## 8. Emergency Contacts
 
 ### Get All Contacts
 - **GET** `/emergency_contacts.php?UserId=1`

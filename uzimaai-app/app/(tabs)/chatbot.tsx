@@ -1,29 +1,137 @@
-import React, { useState, useRef } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList, KeyboardAvoidingView, Platform, Image } from 'react-native';
+import React, { useState, useRef, useEffect } from 'react';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList, KeyboardAvoidingView, Platform, Image, ActivityIndicator, Alert } from 'react-native';
 import * as Speech from 'expo-speech';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { API_ENDPOINTS } from '../../constants/api';
+import { apiRequest } from '../../utils/api';
+import { getSession } from '../../utils/session';
 
-const CHAT = [
-  { id: '1', sender: 'bot', text: "Hello! I'm your medical assistant. I can help you with health information and guidance. How can I assist you today?", time: '9:42 AM' },
-  { id: '2', sender: 'user', text: "I've been having headaches for the past few days. What could be causing this?", time: '9:45 AM' },
-  { id: '3', sender: 'bot', text: "Headaches can have several causes. Here are some common ones:\n\n• Dehydration\n• Stress or tension\n• Lack of sleep\n• Eye strain", time: '9:46 AM' },
-  { id: '4', sender: 'user', text: "What can I do to relieve them?", time: '9:47 AM' },
-  { id: '5', sender: 'bot', text: "Here are some ways to help relieve headaches:\n\n💧 Drink plenty of water\n🛏️ Get adequate rest\n🌿 Try relaxation techniques", time: '9:48 AM' },
-];
+interface ChatMessage {
+  id: string;
+  sender: 'user' | 'bot';
+  text: string;
+  time: string;
+}
+
+const INITIAL_MESSAGE: ChatMessage = {
+  id: '1',
+  sender: 'bot',
+  text: "Hello! I'm your medical assistant. I can help you with health information and guidance. How can I assist you today?",
+  time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+};
 
 export default function ChatbotScreen() {
   const [input, setInput] = useState('');
-  const [messages, setMessages] = useState(CHAT);
+  const [messages, setMessages] = useState<ChatMessage[]>([INITIAL_MESSAGE]);
+  const [loading, setLoading] = useState(false);
+  const [userid, setUserid] = useState<number | null>(null);
   const flatListRef = useRef<FlatList>(null);
 
-  const sendMessage = () => {
-    if (!input.trim()) return;
-    setMessages([...messages, { id: Date.now().toString(), sender: 'user', text: input, time: 'Now' }]);
+  useEffect(() => {
+    // Get user session and load chat history
+    (async () => {
+      const session = await getSession();
+      if (session?.userid) {
+        setUserid(session.userid);
+        loadChatHistory(session.userid);
+      }
+    })();
+  }, []);
+
+  const loadChatHistory = async (uid: number) => {
+    try {
+      const response = await apiRequest(API_ENDPOINTS.getChatHistory, 'GET', undefined, uid.toString());
+      if (response.success && response.data) {
+        const historyMessages: ChatMessage[] = response.data.map((item: any, index: number) => ({
+          id: (index + 2).toString(), // Start from 2 since we have initial message
+          sender: 'user',
+          text: item.message,
+          time: new Date(item.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        }));
+
+        // Add bot responses
+        const botMessages: ChatMessage[] = response.data.map((item: any, index: number) => ({
+          id: `bot-${index + 2}`,
+          sender: 'bot',
+          text: item.response,
+          time: new Date(item.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        }));
+
+        // Interleave user and bot messages
+        const allMessages = [INITIAL_MESSAGE];
+        response.data.forEach((item: any, index: number) => {
+          allMessages.push(historyMessages[index]);
+          allMessages.push(botMessages[index]);
+        });
+
+        setMessages(allMessages);
+      }
+    } catch (error) {
+      console.log('Failed to load chat history:', error);
+    }
+  };
+
+  const sendMessage = async () => {
+    if (!input.trim() || loading) return;
+    if (!userid) {
+      Alert.alert('Error', 'Please log in to use this feature');
+      return;
+    }
+
+    const userMessage: ChatMessage = {
+      id: Date.now().toString(),
+      sender: 'user',
+      text: input,
+      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    };
+
+    setMessages(prev => [...prev, userMessage]);
     setInput('');
+    setLoading(true);
+
+    // Scroll to bottom
     setTimeout(() => {
       flatListRef.current?.scrollToEnd({ animated: true });
     }, 100);
+
+    try {
+      const response = await apiRequest(
+        API_ENDPOINTS.aiChat,
+        'POST',
+        {
+          message: input,
+          userid: userid,
+          type: 'chat'
+        }
+      );
+
+      if (response.success) {
+        const botMessage: ChatMessage = {
+          id: `bot-${Date.now()}`,
+          sender: 'bot',
+          text: response.response,
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        };
+
+        setMessages(prev => [...prev, botMessage]);
+        
+        // Scroll to bottom after bot response
+        setTimeout(() => {
+          flatListRef.current?.scrollToEnd({ animated: true });
+        }, 100);
+      } else {
+        Alert.alert('Error', response.error || 'Failed to get response');
+        // Remove the user message if failed
+        setMessages(prev => prev.filter(msg => msg.id !== userMessage.id));
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Failed to connect to AI service');
+      // Remove the user message if failed
+      setMessages(prev => prev.filter(msg => msg.id !== userMessage.id));
+    } finally {
+      setLoading(false);
+    }
   };
 
   const speakMessage = (text: string) => {
@@ -45,6 +153,7 @@ export default function ChatbotScreen() {
               <Text style={styles.headerStatus}>Online</Text>
             </View>
           </View>
+          
           <FlatList
             ref={flatListRef}
             data={messages}
@@ -53,9 +162,18 @@ export default function ChatbotScreen() {
             contentContainerStyle={{ paddingVertical: 16, paddingHorizontal: 8 }}
             showsVerticalScrollIndicator={false}
           />
+          
+          {loading && (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="small" color="#377DFF" />
+              <Text style={styles.loadingText}>AI is thinking...</Text>
+            </View>
+          )}
+          
           <View style={styles.warningBox}>
             <Text style={styles.warningText}>⚠️ This is not medical advice. Always consult a professional.</Text>
           </View>
+          
           <View style={styles.inputRow}>
             <TextInput
               style={styles.input}
@@ -64,9 +182,18 @@ export default function ChatbotScreen() {
               value={input}
               onChangeText={setInput}
               multiline
+              editable={!loading}
             />
-            <TouchableOpacity style={styles.sendBtn} onPress={sendMessage}>
-              <Text style={styles.sendIcon}>➤</Text>
+            <TouchableOpacity 
+              style={[styles.sendBtn, loading && styles.sendBtnDisabled]} 
+              onPress={sendMessage}
+              disabled={loading}
+            >
+              {loading ? (
+                <ActivityIndicator color="#fff" size="small" />
+              ) : (
+                <Ionicons name="send" size={20} color="#fff" />
+              )}
             </TouchableOpacity>
           </View>
         </View>
@@ -75,7 +202,7 @@ export default function ChatbotScreen() {
   );
 }
 
-function ChatBubble({ message, onSpeak }: { message: { sender: string; text: string; time: string }, onSpeak: (text: string) => void }) {
+function ChatBubble({ message, onSpeak }: { message: ChatMessage, onSpeak: (text: string) => void }) {
   const isUser = message.sender === 'user';
   return (
     <View style={[styles.bubbleRow, isUser && { justifyContent: 'flex-end' }]}>
@@ -83,7 +210,7 @@ function ChatBubble({ message, onSpeak }: { message: { sender: string; text: str
       <View style={[styles.bubble, isUser ? styles.bubbleUser : styles.bubbleBot]}>
         <Text style={[styles.bubbleText, isUser && { color: '#fff' }]}>{message.text}</Text>
         <View style={styles.bubbleFooter}>
-          <Text style={styles.bubbleTime}>{message.time}</Text>
+          <Text style={[styles.bubbleTime, isUser && { color: '#E2E8F0' }]}>{message.time}</Text>
           {!isUser && (
             <TouchableOpacity onPress={() => onSpeak(message.text)} style={styles.speakBtn}>
               <Ionicons name="volume-high" size={20} color="#377DFF" style={styles.speakIcon} />
@@ -199,6 +326,18 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: '#377DFF',
   },
+  loadingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+  },
+  loadingText: {
+    marginLeft: 8,
+    fontSize: 14,
+    color: '#377DFF',
+  },
   warningBox: {
     backgroundColor: '#FFF7E6',
     borderRadius: 10,
@@ -247,9 +386,7 @@ const styles = StyleSheet.create({
     shadowRadius: 6,
     elevation: 2,
   },
-  sendIcon: {
-    color: '#fff',
-    fontSize: 22,
-    fontWeight: 'bold',
+  sendBtnDisabled: {
+    backgroundColor: '#A0AEC0',
   },
 }); 

@@ -11,6 +11,7 @@ export const API_ENDPOINTS = {
   getMedicineReviews: `${API_BASE_URL}/get_medicine_reviews.php`,
   sendMessage: `${API_BASE_URL}/send_message.php`,
   getChatHistory: `${API_BASE_URL}/get_chat_history.php`,
+  aiChat: `${API_BASE_URL}/ai_chat.php`,
   getSearchHistory: `${API_BASE_URL}/get_search_history.php`,
   emergencyContacts: `${API_BASE_URL}/emergency_contacts.php`,
   addEmergencyContact: `${API_BASE_URL}/add_emergency_contact.php`,
