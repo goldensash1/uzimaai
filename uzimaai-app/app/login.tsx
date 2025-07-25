@@ -5,13 +5,25 @@ import { API_ENDPOINTS } from '../constants/api';
 import { apiRequest } from '../utils/api';
 import { saveSession } from '../utils/session';
 
+/**
+ * LoginScreen provides a user interface for users to log in to their health account.
+ * It handles authentication, error display, and navigation to the main app or registration.
+ */
 export default function LoginScreen() {
+  // State variables for user input and UI feedback
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
 
+  /**
+   * Handles the login process:
+   * - Sends login credentials to the API
+   * - Saves user session on success
+   * - Navigates to main app tabs
+   * - Displays error on failure
+   */
   const handleLogin = async () => {
     setLoading(true);
     setError('');
@@ -30,11 +42,18 @@ export default function LoginScreen() {
   };
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }} showsVerticalScrollIndicator={false}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}
+      showsVerticalScrollIndicator={false}
+    >
       <View style={styles.centered}>
+        {/* App logo */}
         <Image source={require('../assets/images/icon.png')} style={styles.logo} />
+        {/* Welcome message */}
         <Text style={styles.title}>Welcome Back</Text>
         <Text style={styles.subtitle}>Sign in to your health account</Text>
+        {/* Input fields for email and password */}
         <View style={styles.inputBox}>
           <TextInput
             style={styles.input}
@@ -54,18 +73,23 @@ export default function LoginScreen() {
             secureTextEntry
           />
         </View>
+        {/* Error message display */}
         {error ? <Text style={{ color: 'red', marginBottom: 8 }}>{error}</Text> : null}
+        {/* Login button */}
         <TouchableOpacity style={styles.loginBtn} onPress={handleLogin} disabled={loading}>
           {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.loginBtnText}>Login</Text>}
         </TouchableOpacity>
+        {/* Forgot password link */}
         <TouchableOpacity>
           <Text style={styles.forgot}>Forgot Password?</Text>
         </TouchableOpacity>
+        {/* Divider for social login */}
         <View style={styles.orRow}>
           <View style={styles.orLine} />
           <Text style={styles.orText}>or</Text>
           <View style={styles.orLine} />
         </View>
+        {/* Social login buttons */}
         <View style={styles.socialRow}>
           <TouchableOpacity style={styles.socialBtn}>
             <Text style={styles.socialIcon}>G</Text>
@@ -78,14 +102,21 @@ export default function LoginScreen() {
             <Text style={styles.socialText}>Continue with Apple</Text>
           </TouchableOpacity>
         </View>
+        {/* Link to registration screen */}
         <Text style={styles.signupText}>
-          Don't have an account? <Text style={styles.signupLink} onPress={() => router.replace('/register')}>Sign Up</Text>
+          Don't have an account?{' '}
+          <Text style={styles.signupLink} onPress={() => router.replace('/register')}>
+            Sign Up
+          </Text>
         </Text>
       </View>
     </ScrollView>
   );
 }
 
+/**
+ * Styles for the LoginScreen components.
+ */
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -206,4 +237,4 @@ const styles = StyleSheet.create({
     color: '#377DFF',
     fontWeight: 'bold',
   },
-}); 
+});
