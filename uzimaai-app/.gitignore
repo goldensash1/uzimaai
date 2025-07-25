@@ -36,4 +36,4 @@ yarn-error.*
 # typescript
 *.tsbuildinfo
 
-admin-dashboard/node_modules/
+../admin-dashboard/node_modules/
