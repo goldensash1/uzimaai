@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Jul 16, 2025 at 11:50 AM
+-- Generation Time: Jul 24, 2025 at 11:03 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -34,6 +34,22 @@ CREATE TABLE `admin` (
   `adminUsername` varchar(100) DEFAULT NULL,
   `adminStatus` varchar(20) DEFAULT NULL,
   `adminPassword` varchar(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `emergencyContacts`
+--
+
+CREATE TABLE `emergencyContacts` (
+  `contactId` int(11) NOT NULL,
+  `UserId` int(11) NOT NULL,
+  `PhoneNumber` varchar(50) NOT NULL,
+  `Relationship` varchar(50) NOT NULL,
+  `ContactName` varchar(200) NOT NULL,
+  `updatedDate` varchar(100) NOT NULL,
+  `contactStatus` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -83,7 +99,7 @@ CREATE TABLE `searchHistory` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `serContext`
+-- Table structure for table `userContext`
 --
 
 CREATE TABLE `userContext` (
@@ -122,6 +138,15 @@ CREATE TABLE `users` (
   `useremail` varchar(100) DEFAULT NULL,
   `username` varchar(100) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `users`
+--
+
+INSERT INTO `users` (`userid`, `phone`, `emergencyphone`, `userpassword`, `userstatus`, `useremail`, `username`) VALUES
+(1, '0786585008', '0788442322', '$2y$10$o5m3OUjVJ1pnO6wnjnDgFON2aTEkZehjysxFKSKxqL8SlrUHSqLo.', 'active', 'goldens222sash@gmail.com', 'Golden Sash Munyankindi'),
+(2, '078888888888', NULL, '$2y$10$JnjR/IAK8VxW3h9Lid3wqe7LSRqyIIX42AB9ZJJ1dVLrDlGVwgX/6', 'active', 'emmanuel@gay.com', 'Emmanuel'),
+(3, '0788876678', NULL, '$2y$10$CwWVNcZajXGx8chsg3Q64..1/65ZaL5v9bM9Zl7UoEqcOM71Je7eK', 'active', 'mosespeter@gmail.com', 'Moses Peter');
 
 --
 -- Indexes for dumped tables
@@ -192,7 +217,7 @@ ALTER TABLE `userHistory`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `userid` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `userid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- Constraints for dumped tables
