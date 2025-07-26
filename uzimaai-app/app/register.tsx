@@ -5,7 +5,12 @@ import { API_ENDPOINTS } from '../constants/api';
 import { apiRequest } from '../utils/api';
 import { saveSession } from '../utils/session';
 
+/**
+ * RegisterScreen provides a user interface for new users to create an account.
+ * It validates input, handles registration requests, displays errors, and navigates to the main app or login screen.
+ */
 export default function RegisterScreen() {
+  // State variables for user input and UI feedback
   const [username, setUsername] = useState('');
   const [useremail, setUseremail] = useState('');
   const [phone, setPhone] = useState('');
@@ -15,6 +20,13 @@ export default function RegisterScreen() {
   const [error, setError] = useState('');
   const router = useRouter();
 
+  /**
+   * Handles the registration process:
+   * - Validates input fields
+   * - Sends registration data to the API
+   * - Saves user session and navigates to main app on success
+   * - Displays error on failure
+   */
   const handleRegister = async () => {
     setError('');
     if (!username || !useremail || !phone || !password || !confirm) {
@@ -44,11 +56,18 @@ export default function RegisterScreen() {
   };
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }} showsVerticalScrollIndicator={false}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}
+      showsVerticalScrollIndicator={false}
+    >
       <View style={styles.centered}>
+        {/* App logo */}
         <Image source={require('../assets/images/icon.png')} style={styles.logo} />
+        {/* Registration title and subtitle */}
         <Text style={styles.title}>Create Account</Text>
         <Text style={styles.subtitle}>Sign up to get started</Text>
+        {/* Input fields for registration */}
         <View style={styles.inputBox}>
           <TextInput
             style={styles.input}
@@ -92,15 +111,19 @@ export default function RegisterScreen() {
             secureTextEntry
           />
         </View>
+        {/* Error message display */}
         {error ? <Text style={{ color: 'red', marginBottom: 8 }}>{error}</Text> : null}
+        {/* Register button */}
         <TouchableOpacity style={styles.registerBtn} onPress={handleRegister} disabled={loading}>
           {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.registerBtnText}>Register</Text>}
         </TouchableOpacity>
+        {/* Divider for social registration */}
         <View style={styles.orRow}>
           <View style={styles.orLine} />
           <Text style={styles.orText}>or</Text>
           <View style={styles.orLine} />
         </View>
+        {/* Social registration buttons */}
         <View style={styles.socialRow}>
           <TouchableOpacity style={styles.socialBtn}>
             <Text style={styles.socialIcon}>G</Text>
@@ -113,14 +136,21 @@ export default function RegisterScreen() {
             <Text style={styles.socialText}>Continue with Apple</Text>
           </TouchableOpacity>
         </View>
+        {/* Link to login screen */}
         <Text style={styles.signupText}>
-          Already have an account? <Text style={styles.signupLink} onPress={() => router.replace('/login')}>Login</Text>
+          Already have an account?{' '}
+          <Text style={styles.signupLink} onPress={() => router.replace('/login')}>
+            Login
+          </Text>
         </Text>
       </View>
     </ScrollView>
   );
 }
 
+/**
+ * Styles for RegisterScreen components.
+ */
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -244,4 +274,4 @@ const styles = StyleSheet.create({
     color: '#377DFF',
     fontWeight: 'bold',
   },
-}); 
+});
