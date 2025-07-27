@@ -3,7 +3,7 @@
 
 ### 1. Clone the Repository
 ```bash
-git clone [<repository-url](https://github.com/goldensash1/uzimaai.git)
+git clone (https://github.com/goldensash1/uzimaai.git)
 cd uzimaai
 ```
 
