@@ -111,3 +111,12 @@ npm install
 npm run dev
 
 
+*Mobile App*
+bash
+cd uzimaai-app
+npm install
+npx expo start
+
+
+---
+
