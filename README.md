@@ -46,4 +46,11 @@ Mobile App
 
 ---
 
+PHP API
+- RESTful endpoints for all features
+- JWT-based authentication
+- Input validation and error handling
+- CORS support
+
+---
 ---
