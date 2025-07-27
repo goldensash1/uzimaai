@@ -1,53 +1,252 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList, ScrollView } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList, ScrollView, ActivityIndicator, Modal, Alert } from 'react-native';
+import { Ionicons, MaterialIcons } from '@expo/vector-icons';
+import { apiRequest } from '../../utils/api';
+import { API_ENDPOINTS } from '../../constants/api';
 
-const EMERGENCIES = [
-  { id: '1', label: 'Burns', desc: 'Heat, chemical, electrical', icon: '🔥', color: '#FFE6E6' },
-  { id: '2', label: 'Cuts', desc: 'Minor to severe wounds', icon: '✂️', color: '#FFE6F0' },
-  { id: '3', label: 'Fainting', desc: 'Loss of consciousness', icon: '😵', color: '#E6F0FF' },
-  { id: '4', label: 'Choking', desc: 'Airway obstruction', icon: '🫁', color: '#E6FFF5' },
-];
+interface FirstAidPractice {
+  id: number;
+  title: string;
+  description: string;
+  steps: string[];
+  category: string;
+  severity: string;
+  image_url?: string;
+  created_at: string;
+}
 
-const TIPS = [
-  { id: '1', title: 'Stay Calm', desc: 'Take a deep breath and assess the situation before acting.', icon: '💡', color: '#E6FFF5' },
-  { id: '2', title: 'Safety First', desc: 'Ensure your safety before helping others.', icon: '🛡️', color: '#E6F0FF' },
+const SEVERITY_COLORS = {
+  'Critical': '#E53935',
+  'High': '#FF9800',
+  'Medium': '#FFC107',
+  'Low': '#4CAF50'
+};
+
+const CATEGORIES = [
+  'All',
+  'Emergency',
+  'Wound Care',
+  'Burns',
+  'Injuries',
+  'Environmental',
+  'Neurological',
+  'Allergic',
+  'Poisoning',
+  'Eye Care',
+  'Minor Injuries',
+  'Dental',
+  'Animal Bites'
 ];
 
 export default function FirstAidScreen() {
+  const [practices, setPractices] = useState<FirstAidPractice[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [search, setSearch] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [selectedPractice, setSelectedPractice] = useState<FirstAidPractice | null>(null);
+  const [modalVisible, setModalVisible] = useState(false);
+
+  useEffect(() => {
+    fetchPractices();
+  }, []);
+
+  const fetchPractices = async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const category = selectedCategory === 'All' ? null : selectedCategory;
+      const url = category 
+        ? `${API_ENDPOINTS.firstAidPractices}?category=${encodeURIComponent(category)}`
+        : API_ENDPOINTS.firstAidPractices;
+      
+      const response = await apiRequest(url);
+      setPractices(response.data || []);
+    } catch (e: any) {
+      setError(e.message || 'Failed to load first aid practices');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filteredPractices = practices.filter(practice =>
+    practice.title.toLowerCase().includes(search.toLowerCase()) ||
+    practice.description.toLowerCase().includes(search.toLowerCase()) ||
+    practice.category.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const openPracticeDetail = (practice: FirstAidPractice) => {
+    setSelectedPractice(practice);
+    setModalVisible(true);
+  };
+
+  const handleEmergencyCall = () => {
+    Alert.alert(
+      'Emergency Call',
+      'Call 911 for immediate emergency assistance?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Call 911', style: 'destructive', onPress: () => {
+          // This would integrate with phone calling functionality
+          Alert.alert('Emergency', 'Please call 911 immediately for emergency assistance.');
+        }}
+      ]
+    );
+  };
+
+  const renderPracticeCard = ({ item }: { item: FirstAidPractice }) => (
+    <TouchableOpacity 
+      style={styles.practiceCard} 
+      onPress={() => openPracticeDetail(item)}
+      activeOpacity={0.7}
+    >
+      <View style={styles.cardHeader}>
+        <View style={styles.severityBadge}>
+          <Text style={[styles.severityText, { color: SEVERITY_COLORS[item.severity as keyof typeof SEVERITY_COLORS] }]}>
+            {item.severity}
+          </Text>
+        </View>
+        <Text style={styles.categoryText}>{item.category}</Text>
+      </View>
+      
+      <Text style={styles.practiceTitle}>{item.title}</Text>
+      <Text style={styles.practiceDescription} numberOfLines={2}>
+        {item.description}
+      </Text>
+      
+      <View style={styles.cardFooter}>
+        <View style={styles.stepsPreview}>
+          <Text style={styles.stepsText}>
+            {item.steps.length} steps
+          </Text>
+        </View>
+        <Ionicons name="chevron-forward" size={20} color="#7B8CA6" />
+      </View>
+    </TouchableOpacity>
+  );
+
   return (
-    <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 40 }} showsVerticalScrollIndicator={false}>
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.title}>First Aid Guide</Text>
+        <Text style={styles.subtitle}>Emergency procedures and first aid practices</Text>
+      </View>
+
+      <TouchableOpacity style={styles.emergencyButton} onPress={handleEmergencyCall}>
+        <Ionicons name="call" size={24} color="#fff" />
+        <Text style={styles.emergencyButtonText}>EMERGENCY - Call 911</Text>
+      </TouchableOpacity>
+
       <TextInput
         style={styles.search}
-        placeholder="Search first aid topics..."
+        placeholder="Search first aid practices..."
         placeholderTextColor="#B0B8C1"
         value={search}
         onChangeText={setSearch}
       />
-      <View style={styles.warningBox}>
-        <Text style={styles.warningText}>❗ Emergency? Call 911 immediately{`\n`}For life-threatening situations</Text>
-      </View>
-      <Text style={styles.sectionTitle}>Common Emergencies</Text>
-      <View style={styles.gridRow}>
-        {EMERGENCIES.map(e => (
-          <View key={e.id} style={[styles.emergencyCard, { backgroundColor: e.color }]}> 
-            <Text style={styles.emergencyIcon}>{e.icon}</Text>
-            <Text style={styles.emergencyLabel}>{e.label}</Text>
-            <Text style={styles.emergencyDesc}>{e.desc}</Text>
-          </View>
+
+      <ScrollView 
+        horizontal 
+        showsHorizontalScrollIndicator={false}
+        style={styles.categoryScroll}
+        contentContainerStyle={styles.categoryContainer}
+      >
+        {CATEGORIES.map(category => (
+          <TouchableOpacity
+            key={category}
+            style={[
+              styles.categoryChip,
+              selectedCategory === category && styles.categoryChipActive
+            ]}
+            onPress={() => {
+              setSelectedCategory(category);
+              fetchPractices();
+            }}
+          >
+            <Text style={[
+              styles.categoryChipText,
+              selectedCategory === category && styles.categoryChipTextActive
+            ]}>
+              {category}
+            </Text>
+          </TouchableOpacity>
         ))}
-      </View>
-      <Text style={styles.sectionTitle}>Quick Tips</Text>
-      {TIPS.map(tip => (
-        <View key={tip.id} style={[styles.tipCard, { backgroundColor: tip.color }]}> 
-          <Text style={styles.tipIcon}>{tip.icon}</Text>
-          <View>
-            <Text style={styles.tipTitle}>{tip.title}</Text>
-            <Text style={styles.tipDesc}>{tip.desc}</Text>
+      </ScrollView>
+
+      {loading ? (
+        <View style={styles.centered}>
+          <ActivityIndicator size="large" color="#377DFF" />
+          <Text style={styles.loadingText}>Loading first aid practices...</Text>
+        </View>
+      ) : error ? (
+        <View style={styles.centered}>
+          <Ionicons name="alert-circle" size={48} color="#E53935" />
+          <Text style={styles.errorText}>{error}</Text>
+          <TouchableOpacity style={styles.retryButton} onPress={fetchPractices}>
+            <Text style={styles.retryButtonText}>Retry</Text>
+          </TouchableOpacity>
+        </View>
+      ) : filteredPractices.length === 0 ? (
+        <View style={styles.centered}>
+          <MaterialIcons name="medical-services" size={64} color="#A0AEC0" />
+          <Text style={styles.emptyText}>No practices found</Text>
+          <Text style={styles.emptySubtext}>Try a different search term or category</Text>
+        </View>
+      ) : (
+        <FlatList
+          data={filteredPractices}
+          keyExtractor={item => item.id.toString()}
+          renderItem={renderPracticeCard}
+          contentContainerStyle={styles.listContainer}
+          showsVerticalScrollIndicator={false}
+        />
+      )}
+
+      <Modal
+        visible={modalVisible}
+        animationType="slide"
+        transparent
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            {selectedPractice && (
+              <>
+                <View style={styles.modalHeader}>
+                  <Text style={styles.modalTitle}>{selectedPractice.title}</Text>
+                  <TouchableOpacity onPress={() => setModalVisible(false)}>
+                    <Ionicons name="close" size={24} color="#7B8CA6" />
+                  </TouchableOpacity>
+                </View>
+                
+                <ScrollView style={styles.modalScroll}>
+                  <View style={styles.severityContainer}>
+                    <View style={[styles.severityBadge, { backgroundColor: SEVERITY_COLORS[selectedPractice.severity as keyof typeof SEVERITY_COLORS] + '20' }]}>
+                      <Text style={[styles.severityText, { color: SEVERITY_COLORS[selectedPractice.severity as keyof typeof SEVERITY_COLORS] }]}>
+                        {selectedPractice.severity}
+                      </Text>
+                    </View>
+                    <Text style={styles.categoryText}>{selectedPractice.category}</Text>
+                  </View>
+                  
+                  <Text style={styles.modalDescription}>{selectedPractice.description}</Text>
+                  
+                  <Text style={styles.stepsTitle}>Steps:</Text>
+                  {selectedPractice.steps.map((step, index) => (
+                    <View key={index} style={styles.stepContainer}>
+                      <View style={styles.stepNumber}>
+                        <Text style={styles.stepNumberText}>{index + 1}</Text>
+                      </View>
+                      <Text style={styles.stepText}>{step}</Text>
+                    </View>
+                  ))}
+                </ScrollView>
+              </>
+            )}
           </View>
         </View>
-      ))}
-    </ScrollView>
+      </Modal>
+    </View>
   );
 }
 
@@ -57,6 +256,43 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     paddingHorizontal: 16,
     paddingTop: 32,
+    paddingBottom: 100, // Add padding for tab bar
+  },
+  header: {
+    marginBottom: 20,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#232B38',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#7B8CA6',
+    textAlign: 'center',
+  },
+  emergencyButton: {
+    backgroundColor: '#E53935',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 12,
+    marginBottom: 20,
+    shadowColor: '#E53935',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  emergencyButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
+    marginLeft: 8,
   },
   search: {
     backgroundColor: '#F5F7FA',
@@ -64,84 +300,214 @@ const styles = StyleSheet.create({
     padding: 14,
     fontSize: 16,
     color: '#232B38',
-    marginBottom: 18,
+    marginBottom: 16,
     borderWidth: 1,
     borderColor: '#E2E8F0',
   },
-  warningBox: {
-    backgroundColor: '#FFE6E6',
-    borderRadius: 10,
-    padding: 12,
-    marginBottom: 18,
+  categoryScroll: {
+    marginBottom: 16,
+  },
+  categoryContainer: {
+    paddingHorizontal: 4,
+  },
+  categoryChip: {
+    backgroundColor: '#F5F7FA',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    marginHorizontal: 4,
     borderWidth: 1,
-    borderColor: '#E53935',
+    borderColor: '#E2E8F0',
   },
-  warningText: {
+  categoryChipActive: {
+    backgroundColor: '#377DFF',
+    borderColor: '#377DFF',
+  },
+  categoryChipText: {
+    color: '#7B8CA6',
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  categoryChipTextActive: {
+    color: '#fff',
+  },
+  centered: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 16,
+    color: '#7B8CA6',
+  },
+  errorText: {
+    marginTop: 12,
+    fontSize: 16,
     color: '#E53935',
-    fontSize: 15,
     textAlign: 'center',
-    fontWeight: 'bold',
-    lineHeight: 20,
+    marginHorizontal: 20,
   },
-  sectionTitle: {
-    fontSize: 17,
+  retryButton: {
+    marginTop: 16,
+    backgroundColor: '#377DFF',
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 12,
+  },
+  retryButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  emptyText: {
+    marginTop: 16,
+    fontSize: 18,
     fontWeight: 'bold',
     color: '#232B38',
-    marginBottom: 10,
+  },
+  emptySubtext: {
     marginTop: 8,
+    fontSize: 14,
+    color: '#7B8CA6',
+    textAlign: 'center',
   },
-  gridRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    marginBottom: 18,
+  listContainer: {
+    paddingBottom: 20,
   },
-  emergencyCard: {
-    width: '48%',
+  practiceCard: {
+    backgroundColor: '#fff',
     borderRadius: 16,
     padding: 16,
     marginBottom: 12,
-    alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.06,
     shadowRadius: 8,
     elevation: 2,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
   },
-  emergencyIcon: {
-    fontSize: 32,
+  cardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: 8,
   },
-  emergencyLabel: {
+  severityBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+    backgroundColor: '#F5F7FA',
+  },
+  severityText: {
+    fontSize: 12,
     fontWeight: 'bold',
-    fontSize: 16,
-    color: '#232B38',
-    marginBottom: 2,
   },
-  emergencyDesc: {
+  categoryText: {
+    fontSize: 12,
     color: '#7B8CA6',
-    fontSize: 14,
-    textAlign: 'center',
+    fontWeight: '500',
   },
-  tipCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderRadius: 14,
-    padding: 14,
+  practiceTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#232B38',
+    marginBottom: 8,
+  },
+  practiceDescription: {
+    fontSize: 14,
+    color: '#4A5568',
+    lineHeight: 20,
     marginBottom: 12,
   },
-  tipIcon: {
-    fontSize: 24,
-    marginRight: 14,
+  cardFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
-  tipTitle: {
+  stepsPreview: {
+    backgroundColor: '#E6F0FF',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+  },
+  stepsText: {
+    fontSize: 12,
+    color: '#377DFF',
+    fontWeight: '500',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    maxHeight: '90%',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E2E8F0',
+  },
+  modalTitle: {
+    fontSize: 20,
     fontWeight: 'bold',
-    fontSize: 15,
     color: '#232B38',
-    marginBottom: 2,
+    flex: 1,
+    marginRight: 16,
   },
-  tipDesc: {
+  modalScroll: {
+    padding: 20,
+  },
+  severityContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  modalDescription: {
+    fontSize: 16,
     color: '#4A5568',
-    fontSize: 14,
+    lineHeight: 24,
+    marginBottom: 20,
+  },
+  stepsTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#232B38',
+    marginBottom: 12,
+  },
+  stepContainer: {
+    flexDirection: 'row',
+    marginBottom: 12,
+    alignItems: 'flex-start',
+  },
+  stepNumber: {
+    backgroundColor: '#377DFF',
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+    marginTop: 2,
+  },
+  stepNumberText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  stepText: {
+    fontSize: 15,
+    color: '#4A5568',
+    lineHeight: 22,
+    flex: 1,
   },
 }); 

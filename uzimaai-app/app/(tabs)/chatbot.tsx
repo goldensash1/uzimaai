@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList, KeyboardAvoidingView, Platform, Image, ActivityIndicator, Alert } from 'react-native';
 import * as Speech from 'expo-speech';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { API_ENDPOINTS } from '../../constants/api';
 import { apiRequest } from '../../utils/api';
@@ -41,8 +40,8 @@ export default function ChatbotScreen() {
 
   const loadChatHistory = async (uid: number) => {
     try {
-      const response = await apiRequest(API_ENDPOINTS.getChatHistory, 'GET', undefined, uid.toString());
-      if (response.success && response.data) {
+      const response = await apiRequest(`${API_ENDPOINTS.getChatHistory}?userId=${uid}`, 'GET');
+      if (response.success && response.data && response.data.length > 0) {
         const historyMessages: ChatMessage[] = response.data.map((item: any, index: number) => ({
           id: (index + 2).toString(), // Start from 2 since we have initial message
           sender: 'user',
@@ -96,6 +95,8 @@ export default function ChatbotScreen() {
     }, 100);
 
     try {
+      console.log('Sending message to AI:', { message: input, userid: userid, type: 'chat' });
+      
       const response = await apiRequest(
         API_ENDPOINTS.aiChat,
         'POST',
@@ -106,7 +107,9 @@ export default function ChatbotScreen() {
         }
       );
 
-      if (response.success) {
+      console.log('AI response received:', response);
+
+      if (response.success && response.response) {
         const botMessage: ChatMessage = {
           id: `bot-${Date.now()}`,
           sender: 'bot',
@@ -121,12 +124,14 @@ export default function ChatbotScreen() {
           flatListRef.current?.scrollToEnd({ animated: true });
         }, 100);
       } else {
-        Alert.alert('Error', response.error || 'Failed to get response');
+        console.error('AI response error:', response);
+        Alert.alert('Error', response.error || 'Failed to get response from AI');
         // Remove the user message if failed
         setMessages(prev => prev.filter(msg => msg.id !== userMessage.id));
       }
     } catch (error) {
-      Alert.alert('Error', 'Failed to connect to AI service');
+      console.error('AI request failed:', error);
+      Alert.alert('Error', 'Failed to connect to AI service. Please check your connection and try again.');
       // Remove the user message if failed
       setMessages(prev => prev.filter(msg => msg.id !== userMessage.id));
     } finally {
@@ -139,13 +144,14 @@ export default function ChatbotScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <View style={styles.safeArea}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 60}
       >
         <View style={styles.container}>
+          <View style={styles.chatContainer}>
           <View style={styles.header}>
             <Image source={require('../../assets/images/icon.png')} style={styles.avatarBot} resizeMode="contain" />
             <View style={{ flex: 1 }}>
@@ -159,8 +165,11 @@ export default function ChatbotScreen() {
             data={messages}
             keyExtractor={item => item.id}
             renderItem={({ item }) => <ChatBubble message={item} onSpeak={speakMessage} />}
-            contentContainerStyle={{ paddingVertical: 16, paddingHorizontal: 8 }}
+            contentContainerStyle={{ paddingVertical: 16, paddingHorizontal: 8, paddingBottom: 100 }}
             showsVerticalScrollIndicator={false}
+            inverted={false}
+            onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: true })}
+            onLayout={() => flatListRef.current?.scrollToEnd({ animated: true })}
           />
           
           {loading && (
@@ -174,31 +183,36 @@ export default function ChatbotScreen() {
             <Text style={styles.warningText}>⚠️ This is not medical advice. Always consult a professional.</Text>
           </View>
           
-          <View style={styles.inputRow}>
-            <TextInput
-              style={styles.input}
-              placeholder="Type your message..."
-              placeholderTextColor="#B0B8C1"
-              value={input}
-              onChangeText={setInput}
-              multiline
-              editable={!loading}
-            />
-            <TouchableOpacity 
-              style={[styles.sendBtn, loading && styles.sendBtnDisabled]} 
-              onPress={sendMessage}
-              disabled={loading}
-            >
-              {loading ? (
-                <ActivityIndicator color="#fff" size="small" />
-              ) : (
-                <Ionicons name="send" size={20} color="#fff" />
-              )}
-            </TouchableOpacity>
+          </View>
+          
+          <View style={styles.inputContainer}>
+            <View style={styles.inputRow}>
+              <TextInput
+                style={styles.input}
+                placeholder="Type your message..."
+                placeholderTextColor="#B0B8C1"
+                value={input}
+                onChangeText={setInput}
+                multiline
+                editable={!loading}
+                maxLength={500}
+              />
+              <TouchableOpacity 
+                style={[styles.sendBtn, loading && styles.sendBtnDisabled]} 
+                onPress={sendMessage}
+                disabled={loading || !input.trim()}
+              >
+                {loading ? (
+                  <ActivityIndicator color="#fff" size="small" />
+                ) : (
+                  <Ionicons name="send" size={20} color="#fff" />
+                )}
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -227,14 +241,17 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: '#fff',
-    paddingTop: 0,
+    paddingTop: 50, // Add top padding to avoid navigation bar
     paddingBottom: 0,
   },
   container: {
     flex: 1,
     backgroundColor: '#fff',
     paddingTop: 0,
-    paddingBottom: 0,
+    paddingBottom: 100, // Add bottom padding for tab bar
+  },
+  chatContainer: {
+    flex: 1,
     justifyContent: 'flex-end',
   },
   header: {
@@ -351,6 +368,15 @@ const styles = StyleSheet.create({
     color: '#B7791F',
     fontSize: 14,
     textAlign: 'center',
+  },
+  inputContainer: {
+    backgroundColor: '#fff',
+    borderTopWidth: 1,
+    borderTopColor: '#E2E8F0',
+    paddingTop: 8,
+    paddingBottom: 100, // Increase bottom padding for tab bar
+    position: 'relative',
+    zIndex: 10,
   },
   inputRow: {
     flexDirection: 'row',

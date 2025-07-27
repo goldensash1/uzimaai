@@ -92,11 +92,11 @@ export default function ProfileScreen() {
 
   return (
     <>
-      <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 40 }} showsVerticalScrollIndicator={false}>
+      <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
           <FontAwesome name="user-circle" size={84} color="#377DFF" style={styles.profileIcon} />
-          <Text style={styles.name}>{user?.username || ''}</Text>
-          <Text style={styles.email}>{user?.useremail || ''}</Text>
+          <Text style={styles.name} numberOfLines={1} ellipsizeMode="tail">{user?.username || ''}</Text>
+          <Text style={styles.email} numberOfLines={1} ellipsizeMode="tail">{user?.useremail || ''}</Text>
           <View style={styles.statsRow}>
             {/* Placeholder stats, replace with real data if available */}
             <View style={styles.statBox}><Text style={[styles.statValue, { color: '#377DFF' }]}>0</Text><Text style={styles.statLabel}>Symptoms</Text></View>
@@ -193,6 +193,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     paddingHorizontal: 16,
     paddingTop: 32,
+  },
+  scrollContent: {
+    paddingBottom: 100, // Add padding for tab bar
   },
   header: {
     alignItems: 'center',

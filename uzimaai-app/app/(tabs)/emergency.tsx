@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList, ActivityIndicator, Modal, TextInput, Alert } from 'react-native';
 import { Ionicons, MaterialIcons, FontAwesome } from '@expo/vector-icons';
+import * as Linking from 'expo-linking';
 import { apiRequest } from '../../utils/api';
 import { API_ENDPOINTS } from '../../constants/api';
 import { getSession } from '../../utils/session';
+import CustomPicker from '../../components/CustomPicker';
 
 // Define a type for EmergencyContact
 interface EmergencyContact {
@@ -15,6 +17,20 @@ interface EmergencyContact {
   updatedDate: string;
   contactStatus: number;
 }
+
+// Relationship options for dropdown
+const RELATIONSHIP_OPTIONS = [
+  { label: 'Select Relationship', value: '' },
+  { label: 'Spouse/Partner', value: 'Spouse/Partner' },
+  { label: 'Parent', value: 'Parent' },
+  { label: 'Child', value: 'Child' },
+  { label: 'Sibling', value: 'Sibling' },
+  { label: 'Friend', value: 'Friend' },
+  { label: 'Colleague', value: 'Colleague' },
+  { label: 'Doctor', value: 'Doctor' },
+  { label: 'Neighbor', value: 'Neighbor' },
+  { label: 'Other', value: 'Other' },
+];
 
 export default function EmergencyScreen() {
   const [contacts, setContacts] = useState<EmergencyContact[]>([]);
@@ -113,17 +129,48 @@ export default function EmergencyScreen() {
     }
   }
 
+  const handleCallContact = (phoneNumber: string, contactName: string) => {
+    Alert.alert(
+      'Call Contact',
+      `Call ${contactName}?`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { 
+          text: 'Call', 
+          onPress: () => {
+            const phoneUrl = `tel:${phoneNumber}`;
+            Linking.canOpenURL(phoneUrl).then(supported => {
+              if (supported) {
+                Linking.openURL(phoneUrl);
+              } else {
+                Alert.alert('Error', 'Cannot make phone calls on this device');
+              }
+            });
+          }
+        }
+      ]
+    );
+  };
+
   function renderContact({ item }: { item: EmergencyContact }) {
     const isPrimary = item.contactStatus === 2;
     return (
       <View style={[styles.contactCard, isPrimary && styles.primaryCard]}>  
-        <View style={{ flex: 1 }}>
-          <Text style={styles.contactName}>{item.ContactName}</Text>
-          <Text style={styles.contactRelation}>{item.Relationship}</Text>
-          <Text style={styles.contactPhone}>{item.PhoneNumber}</Text>
+        <View style={styles.contactInfo}>
+          <Text style={styles.contactName} numberOfLines={1}>{item.ContactName}</Text>
+          <Text style={styles.contactRelation} numberOfLines={1}>{item.Relationship}</Text>
+          <Text style={styles.contactPhone} numberOfLines={1}>{item.PhoneNumber}</Text>
+          {isPrimary && (
+            <View style={styles.primaryBadge}>
+              <Text style={styles.primaryBadgeText}>PRIMARY</Text>
+            </View>
+          )}
         </View>
         <View style={styles.actionsCol}>
-          <TouchableOpacity style={styles.iconBtn} onPress={() => {/* Call action */}}>
+          <TouchableOpacity 
+            style={styles.iconBtn} 
+            onPress={() => handleCallContact(item.PhoneNumber, item.ContactName)}
+          >
             <Ionicons name="call" size={22} color="#2CD283" />
           </TouchableOpacity>
           <TouchableOpacity style={styles.iconBtn} onPress={() => openEditModal(item)}>
@@ -132,10 +179,8 @@ export default function EmergencyScreen() {
           <TouchableOpacity style={styles.iconBtn} onPress={() => handleDelete(item.contactId)}>
             <MaterialIcons name="delete" size={22} color="#E53935" />
           </TouchableOpacity>
-          {isPrimary ? (
-            <View style={styles.primaryBadge}><Text style={styles.primaryBadgeText}>PRIMARY</Text></View>
-          ) : (
-            <TouchableOpacity onPress={() => handleSetPrimary(item.contactId)}>
+          {!isPrimary && (
+            <TouchableOpacity style={styles.iconBtn} onPress={() => handleSetPrimary(item.contactId)}>
               <FontAwesome name="star-o" size={20} color="#377DFF" />
             </TouchableOpacity>
           )}
@@ -146,24 +191,48 @@ export default function EmergencyScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Emergency Contacts</Text>
+      <View style={styles.header}>
+        <Text style={styles.title}>Emergency Contacts</Text>
+        <Text style={styles.subtitle}>Manage your emergency contacts</Text>
+      </View>
+      
       {loading ? (
-        <View style={styles.centered}><ActivityIndicator size="large" color="#377DFF" /></View>
+        <View style={styles.centered}>
+          <ActivityIndicator size="large" color="#377DFF" />
+          <Text style={styles.loadingText}>Loading contacts...</Text>
+        </View>
       ) : error ? (
-        <View style={styles.centered}><Text style={{ color: 'red' }}>{error}</Text></View>
+        <View style={styles.centered}>
+          <Ionicons name="alert-circle" size={48} color="#E53935" />
+          <Text style={styles.errorText}>{error}</Text>
+          <TouchableOpacity style={styles.retryButton} onPress={() => fetchContacts(userId!)}>
+            <Text style={styles.retryButtonText}>Retry</Text>
+          </TouchableOpacity>
+        </View>
+      ) : contacts.length === 0 ? (
+        <View style={styles.centered}>
+          <Ionicons name="people" size={64} color="#A0AEC0" />
+          <Text style={styles.emptyText}>No emergency contacts</Text>
+          <Text style={styles.emptySubtext}>Add your first emergency contact below</Text>
+        </View>
       ) : (
         <FlatList
           data={contacts}
           keyExtractor={item => item.contactId.toString()}
           renderItem={renderContact}
-          contentContainerStyle={{ paddingBottom: 40 }}
+          contentContainerStyle={styles.listContainer}
           showsVerticalScrollIndicator={false}
+          ListHeaderComponent={
+            <View style={styles.listHeader}>
+              <Text style={styles.listHeaderText}>{contacts.length} contact{contacts.length !== 1 ? 's' : ''}</Text>
+            </View>
+          }
         />
       )}
+      
       <TouchableOpacity style={styles.fab} onPress={openAddModal} activeOpacity={0.85}>
-        <Ionicons name="add" size={36} color="#fff" />
+        <Ionicons name="add" size={28} color="#fff" />
       </TouchableOpacity>
-      <Text style={styles.fabLabel}>Add Contact</Text>
       <Modal visible={modalVisible} animationType="slide" transparent>
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
@@ -174,11 +243,12 @@ export default function EmergencyScreen() {
               value={form.ContactName}
               onChangeText={v => setForm(f => ({ ...f, ContactName: v }))}
             />
-            <TextInput
-              style={styles.input}
-              placeholder="Relationship"
+            <CustomPicker
               value={form.Relationship}
-              onChangeText={v => setForm(f => ({ ...f, Relationship: v }))}
+              onValueChange={(value: string) => setForm(f => ({ ...f, Relationship: value }))}
+              items={RELATIONSHIP_OPTIONS}
+              placeholder="Select Relationship"
+              style={styles.pickerContainer}
             />
             <TextInput
               style={styles.input}
@@ -208,18 +278,75 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     paddingHorizontal: 16,
     paddingTop: 32,
+    paddingBottom: 100, // Add padding for tab bar
+  },
+  header: {
+    marginBottom: 24,
   },
   title: {
-    fontSize: 22,
+    fontSize: 28,
     fontWeight: 'bold',
     color: '#232B38',
-    marginBottom: 18,
-    alignSelf: 'center',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#7B8CA6',
+    textAlign: 'center',
   },
   centered: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 16,
+    color: '#7B8CA6',
+  },
+  errorText: {
+    marginTop: 12,
+    fontSize: 16,
+    color: '#E53935',
+    textAlign: 'center',
+    marginHorizontal: 20,
+  },
+  retryButton: {
+    marginTop: 16,
+    backgroundColor: '#377DFF',
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 12,
+  },
+  retryButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  emptyText: {
+    marginTop: 16,
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#232B38',
+  },
+  emptySubtext: {
+    marginTop: 8,
+    fontSize: 14,
+    color: '#7B8CA6',
+    textAlign: 'center',
+  },
+  listContainer: {
+    paddingBottom: 100,
+  },
+  listHeader: {
+    marginBottom: 16,
+    paddingHorizontal: 4,
+  },
+  listHeaderText: {
+    fontSize: 14,
+    color: '#7B8CA6',
+    fontWeight: '600',
   },
   contactCard: {
     flexDirection: 'row',
@@ -233,6 +360,10 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.06,
     shadowRadius: 8,
     elevation: 2,
+  },
+  contactInfo: {
+    flex: 1,
+    marginRight: 12,
   },
   primaryCard: {
     borderWidth: 2,
@@ -346,5 +477,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     alignItems: 'center',
     marginHorizontal: 4,
+  },
+  pickerContainer: {
+    marginBottom: 12,
   },
 }); 

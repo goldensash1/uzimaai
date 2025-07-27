@@ -71,7 +71,11 @@ export default function SymptomCheckerScreen() {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <View style={styles.container}>
-        <ScrollView showsVerticalScrollIndicator={false}>
+        <ScrollView 
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+        >
           <View style={styles.header}>
             <Image source={require('../../assets/images/icon.png')} style={styles.icon} />
             <Text style={styles.title}>Describe Your Symptoms</Text>
@@ -139,6 +143,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     paddingHorizontal: 24,
     paddingTop: 40,
+  },
+  scrollContent: {
+    paddingBottom: 100, // Add padding for tab bar
   },
   header: {
     alignItems: 'center',

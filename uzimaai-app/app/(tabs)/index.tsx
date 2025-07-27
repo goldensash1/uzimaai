@@ -16,8 +16,10 @@ export default function HomeScreen() {
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <View>
-          <Text style={styles.greeting}>Hi{username ? `, ${username}!` : '!'}</Text>
+        <View style={styles.headerTextContainer}>
+          <Text style={styles.greeting} numberOfLines={1} ellipsizeMode="tail">
+            Hi{username ? `, ${username}!` : '!'}
+          </Text>
           <Text style={styles.subtitle}>How are you feeling today?</Text>
         </View>
         <View style={styles.profileIconBox}>
@@ -124,6 +126,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     marginBottom: 32,
+  },
+  headerTextContainer: {
+    flex: 1,
+    marginRight: 16,
   },
   greeting: {
     fontSize: 28,

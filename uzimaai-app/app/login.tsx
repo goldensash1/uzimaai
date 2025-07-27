@@ -37,7 +37,16 @@ export default function LoginScreen() {
       router.replace('/(tabs)'); // Go to main app
     } catch (e: any) {
       setLoading(false);
-      setError(e.message || 'Login failed');
+      // Provide more specific error messages
+      if (e.message.includes('Cannot connect to server')) {
+        setError('Connection failed. Please check if XAMPP is running and your IP address is correct.');
+      } else if (e.message.includes('Invalid credentials')) {
+        setError('Invalid email/phone or password. Please try again.');
+      } else if (e.message.includes('Missing required fields')) {
+        setError('Please enter both email/phone and password.');
+      } else {
+        setError(e.message || 'Login failed. Please try again.');
+      }
     }
   };
 

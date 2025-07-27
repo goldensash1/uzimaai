@@ -44,6 +44,11 @@ export default function MedicineScreen() {
 
   return (
     <View style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.title}>Medicine Database</Text>
+        <Text style={styles.subtitle}>Search and learn about medicines</Text>
+      </View>
+      
       <TextInput
         style={styles.search}
         placeholder="Search medicines..."
@@ -51,13 +56,26 @@ export default function MedicineScreen() {
         value={search}
         onChangeText={setSearch}
       />
-      <FlatList
-        data={filtered}
-        keyExtractor={item => item.medicineId}
-        renderItem={({ item }) => <MedicineCard medicine={item} />}
-        contentContainerStyle={{ paddingBottom: 40 }}
-        showsVerticalScrollIndicator={false}
-      />
+      
+      {filtered.length === 0 && search.length > 0 ? (
+        <View style={styles.emptyState}>
+          <Text style={styles.emptyText}>No medicines found</Text>
+          <Text style={styles.emptySubtext}>Try a different search term</Text>
+        </View>
+      ) : (
+        <FlatList
+          data={filtered}
+          keyExtractor={item => item.medicineId}
+          renderItem={({ item }) => <MedicineCard medicine={item} />}
+          contentContainerStyle={styles.listContainer}
+          showsVerticalScrollIndicator={false}
+          ListHeaderComponent={
+            <View style={styles.listHeader}>
+              <Text style={styles.listHeaderText}>{filtered.length} medicine{filtered.length !== 1 ? 's' : ''} found</Text>
+            </View>
+          }
+        />
+      )}
     </View>
   );
 }
@@ -66,17 +84,16 @@ function MedicineCard({ medicine }: { medicine: Medicine }) {
   const [expanded, setExpanded] = useState(false);
   return (
     <View style={styles.card}>
-      <TouchableOpacity onPress={() => setExpanded(e => !e)}>
-        <Text style={styles.medicineName}>{medicine.medicineName}</Text>
+      <TouchableOpacity onPress={() => setExpanded(e => !e)} activeOpacity={0.7}>
+        <Text style={styles.medicineName} numberOfLines={2}>{medicine.medicineName}</Text>
         <Text style={styles.label}>Uses:</Text>
-        <Text style={styles.value}>{medicine.medicineUses}</Text>
+        <Text style={styles.value} numberOfLines={expanded ? undefined : 2}>{medicine.medicineUses}</Text>
         <Text style={styles.label}>Side Effects:</Text>
-        <Text style={styles.value}>{medicine.medicineSideEffects}</Text>
+        <Text style={styles.value} numberOfLines={expanded ? undefined : 2}>{medicine.medicineSideEffects}</Text>
         <Text style={styles.label}>Alternatives:</Text>
-        <Text style={styles.value}>{medicine.medicineAlternatives}</Text>
-        <Text style={styles.detailsBtn}>{expanded ? 'Hide Details' : 'View Details'}</Text>
+        <Text style={styles.value} numberOfLines={expanded ? undefined : 2}>{medicine.medicineAlternatives}</Text>
+        <Text style={styles.detailsBtn}>{expanded ? 'Show Less' : 'Show More'}</Text>
       </TouchableOpacity>
-      {/* Reviews can be fetched and displayed here if needed */}
     </View>
   );
 }
@@ -87,6 +104,49 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     paddingHorizontal: 16,
     paddingTop: 32,
+    paddingBottom: 100, // Add padding for tab bar
+  },
+  header: {
+    marginBottom: 24,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#232B38',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#7B8CA6',
+    textAlign: 'center',
+  },
+  emptyState: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  emptyText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#232B38',
+    marginBottom: 8,
+  },
+  emptySubtext: {
+    fontSize: 14,
+    color: '#7B8CA6',
+  },
+  listContainer: {
+    paddingBottom: 100,
+  },
+  listHeader: {
+    marginBottom: 16,
+    paddingHorizontal: 4,
+  },
+  listHeaderText: {
+    fontSize: 14,
+    color: '#7B8CA6',
+    fontWeight: '600',
   },
   search: {
     backgroundColor: '#F5F7FA',

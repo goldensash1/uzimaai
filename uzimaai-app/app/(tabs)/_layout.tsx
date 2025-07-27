@@ -1,18 +1,40 @@
 import React from 'react';
 import { Ionicons, MaterialIcons, FontAwesome } from '@expo/vector-icons';
 import { Link, Tabs } from 'expo-router';
-import { Pressable } from 'react-native';
+import { Pressable, View, Text, StyleSheet } from 'react-native';
 
 import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/components/useColorScheme';
 import { useClientOnlyValue } from '@/components/useClientOnlyValue';
 
-// You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
+// Custom Tab Bar Icon Component with better styling
 function TabBarIcon(props: {
   name: React.ComponentProps<typeof FontAwesome>['name'];
   color: string;
+  focused: boolean;
+  size?: number;
 }) {
-  return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
+  return <FontAwesome size={props.size || 24} style={{ marginBottom: -3 }} {...props} />;
+}
+
+// Custom Ionicons component
+function TabBarIonicIcon(props: {
+  name: React.ComponentProps<typeof Ionicons>['name'];
+  color: string;
+  focused: boolean;
+  size?: number;
+}) {
+  return <Ionicons size={props.size || 24} style={{ marginBottom: -3 }} {...props} />;
+}
+
+// Custom MaterialIcons component
+function TabBarMaterialIcon(props: {
+  name: React.ComponentProps<typeof MaterialIcons>['name'];
+  color: string;
+  focused: boolean;
+  size?: number;
+}) {
+  return <MaterialIcons size={props.size || 24} style={{ marginBottom: -3 }} {...props} />;
 }
 
 export default function TabLayout() {
@@ -21,83 +43,169 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+        tabBarActiveTintColor: '#377DFF',
         tabBarInactiveTintColor: '#A0AEC0',
         tabBarStyle: {
-          height: 60,
+          height: 80,
           borderTopLeftRadius: 24,
           borderTopRightRadius: 24,
           position: 'absolute',
-          left: 0,
-          right: 0,
-          bottom: 0,
-          elevation: 10,
-          backgroundColor: '#fff',
-          shadowColor: '#000',
-          shadowOffset: { width: 0, height: -2 },
-          shadowOpacity: 0.08,
-          shadowRadius: 8,
+          left: 8,
+          right: 8,
+          bottom: 8,
+          elevation: 20,
+          backgroundColor: 'rgba(255, 255, 255, 0.95)',
+          shadowColor: '#377DFF',
+          shadowOffset: { width: 0, height: -4 },
+          shadowOpacity: 0.15,
+          shadowRadius: 12,
+          borderTopWidth: 0,
+          paddingTop: 8,
+          paddingBottom: 16,
+          paddingHorizontal: 8,
         },
         headerShown: false,
-        tabBarShowLabel: false,
+        tabBarShowLabel: true,
+        tabBarLabelStyle: {
+          fontSize: 11,
+          fontWeight: '600',
+          marginTop: 4,
+        },
+        tabBarIconStyle: {
+          marginTop: 4,
+        },
+        tabBarItemStyle: {
+          paddingVertical: 4,
+        },
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
+          title: 'Home',
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons name="home" size={26} color={color} style={{ marginBottom: -3 }} />
+            <View style={[styles.iconContainer, focused && styles.iconContainerActive]}>
+              <TabBarIonicIcon 
+                name="home" 
+                size={focused ? 26 : 24} 
+                color={focused ? '#377DFF' : color} 
+                focused={focused}
+              />
+            </View>
           ),
         }}
       />
       <Tabs.Screen
         name="two"
         options={{
+          title: 'Symptoms',
           tabBarIcon: ({ color, focused }) => (
-            <MaterialIcons name="sick" size={26} color={color} style={{ marginBottom: -3 }} />
+            <View style={[styles.iconContainer, focused && styles.iconContainerActive]}>
+              <TabBarMaterialIcon 
+                name="sick" 
+                size={focused ? 26 : 24} 
+                color={focused ? '#377DFF' : color} 
+                focused={focused}
+              />
+            </View>
           ),
         }}
       />
       <Tabs.Screen
         name="medicine"
         options={{
+          title: 'Medicine',
           tabBarIcon: ({ color, focused }) => (
-            <FontAwesome name="medkit" size={26} color={color} style={{ marginBottom: -3 }} />
+            <View style={[styles.iconContainer, focused && styles.iconContainerActive]}>
+              <TabBarIcon 
+                name="medkit" 
+                size={focused ? 26 : 24} 
+                color={focused ? '#377DFF' : color} 
+                focused={focused}
+              />
+            </View>
           ),
         }}
       />
       <Tabs.Screen
         name="chatbot"
         options={{
+          title: 'AI Chat',
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons name="chatbubble-ellipses" size={28} color={color} style={{ marginBottom: -3 }} />
+            <View style={[styles.iconContainer, focused && styles.iconContainerActive]}>
+              <TabBarIonicIcon 
+                name="chatbubble-ellipses" 
+                size={focused ? 28 : 26} 
+                color={focused ? '#377DFF' : color} 
+                focused={focused}
+              />
+            </View>
           ),
         }}
       />
       <Tabs.Screen
         name="emergency"
         options={{
+          title: 'Emergency',
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons name="call" size={26} color={color} style={{ marginBottom: -3 }} />
+            <View style={[styles.iconContainer, focused && styles.iconContainerActive]}>
+              <TabBarIonicIcon 
+                name="call" 
+                size={focused ? 26 : 24} 
+                color={focused ? '#377DFF' : color} 
+                focused={focused}
+              />
+            </View>
           ),
         }}
       />
       <Tabs.Screen
         name="firstaid"
         options={{
+          title: 'First Aid',
           tabBarIcon: ({ color, focused }) => (
-            <MaterialIcons name="health-and-safety" size={26} color={color} style={{ marginBottom: -3 }} />
+            <View style={[styles.iconContainer, focused && styles.iconContainerActive]}>
+              <TabBarMaterialIcon 
+                name="health-and-safety" 
+                size={focused ? 26 : 24} 
+                color={focused ? '#377DFF' : color} 
+                focused={focused}
+              />
+            </View>
           ),
         }}
       />
       <Tabs.Screen
         name="profile"
         options={{
+          title: 'Profile',
           tabBarIcon: ({ color, focused }) => (
-            <FontAwesome name="user" size={26} color={color} style={{ marginBottom: -3 }} />
+            <View style={[styles.iconContainer, focused && styles.iconContainerActive]}>
+              <TabBarIcon 
+                name="user" 
+                size={focused ? 26 : 24} 
+                color={focused ? '#377DFF' : color} 
+                focused={focused}
+              />
+            </View>
           ),
         }}
       />
     </Tabs>
   );
 }
+
+const styles = StyleSheet.create({
+  iconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'transparent',
+  },
+  iconContainerActive: {
+    backgroundColor: 'rgba(55, 125, 255, 0.1)',
+    transform: [{ scale: 1.1 }],
+  },
+});
