@@ -147,7 +147,7 @@ npx expo start
 ### Environment Variables
 
 **Admin Dashboard Backend (.env):**
-
+```bash
 NODE_ENV=development
 PORT=8000
 JWT_SECRET=your-secret-key
@@ -157,9 +157,10 @@ DB_PASSWORD=
 DB_NAME=uzimaaidb
 DB_PORT=3306
 CORS_ORIGIN=http://localhost:5173
-
+```
 *Mobile App API Configuration:*
+```bash
 Update uzimaai-app/constants/api.ts with your local IP address.
-
+```
 ---
 
