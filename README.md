@@ -164,3 +164,135 @@ Update uzimaai-app/constants/api.ts with your local IP address.
 ```
 ---
 
+## 8. API Documentation
+
+*Authentication*
+- POST /api/endpoints/register.php - User registration
+- POST /api/endpoints/login.php - User login
+- GET /api/endpoints/profile.php - Get user profile
+- POST /api/endpoints/update_profile.php - Update profile
+- POST /api/endpoints/change_password.php - Change password
+
+*Medicines*
+- GET /api/endpoints/medicines.php - Get medicines list
+- POST /api/endpoints/add_medicine_review.php - Add review
+- GET /api/endpoints/get_medicine_reviews.php - Get reviews
+
+*AI Chat*
+- POST /api/endpoints/send_message.php - Send message
+- GET /api/endpoints/get_chat_history.php - Get chat history
+- POST /api/endpoints/ai_chat.php - AI chat processing
+- GET /api/endpoints/ai_status.php - Check AI status
+
+*Emergency & First Aid*
+- GET /api/endpoints/emergency_contacts.php - Get contacts
+- POST /api/endpoints/add_emergency_contact.php - Add contact
+- GET /api/endpoints/first_aid_practices.php - Get first aid procedures
+
+*Search & History*
+- GET /api/endpoints/get_search_history.php - Get search history
+
+*For detailed request/response examples, see [api/README.md](api/README.md).*
+
+---
+
+## 8. API Documentation
+
+*Authentication*
+- POST /api/endpoints/register.php - User registration
+- POST /api/endpoints/login.php - User login
+- GET /api/endpoints/profile.php - Get user profile
+- POST /api/endpoints/update_profile.php - Update profile
+- POST /api/endpoints/change_password.php - Change password
+
+*Medicines*
+- GET /api/endpoints/medicines.php - Get medicines list
+- POST /api/endpoints/add_medicine_review.php - Add review
+- GET /api/endpoints/get_medicine_reviews.php - Get reviews
+
+*AI Chat*
+- POST /api/endpoints/send_message.php - Send message
+- GET /api/endpoints/get_chat_history.php - Get chat history
+- POST /api/endpoints/ai_chat.php - AI chat processing
+- GET /api/endpoints/ai_status.php - Check AI status
+
+*Emergency & First Aid*
+- GET /api/endpoints/emergency_contacts.php - Get contacts
+- POST /api/endpoints/add_emergency_contact.php - Add contact
+- GET /api/endpoints/first_aid_practices.php - Get first aid procedures
+
+*Search & History*
+- GET /api/endpoints/get_search_history.php - Get search history
+
+*For detailed request/response examples, see [api/README.md](api/README.md).*
+
+---
+
+## 9. Development & Testing
+
+- See the "Development" and "Testing" sections in your current README for workflow and API testing examples.
+- Use Expo Go for mobile app testing.
+- Use Postman or curl for API testing.
+
+---
+
+## 10. Deployment
+
+- Build frontend: npm run build in admin-dashboard/client
+- Set production environment and start backend: NODE_ENV=production npm start in admin-dashboard/server
+- Deploy PHP API to a web server (Apache/Nginx)
+- Build mobile app for production with Expo
+
+---
+
+## 11. Default Credentials
+
+*Admin Dashboard*
+- Username: admin
+- Email: admin@uzimaai.com
+- Password: admin123
+
+*Sample User*
+- Email: john@example.com
+- Password: user123
+
+---
+
+## 12. Troubleshooting
+
+- Database connection issues: Check MySQL service and credentials
+- Mobile app API connection: Update IP, check XAMPP, test endpoints
+- Admin dashboard issues: Check Node.js version, clear npm cache, reinstall dependencies
+- Expo issues: Clear Expo cache, reset Metro bundler
+- Network: Allow necessary ports, ensure devices are on the same network
+
+---
+
+## 13. Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test thoroughly
+5. Submit a pull request
+
+---
+
+## 14. License
+
+This project is licensed under the MIT License.
+
+---
+
+## 15. Support
+
+For issues and questions:
+1. Check the troubleshooting section
+2. Review the documentation
+3. Check existing issues
+4. Create a new issue with detailed information
+
+---
+
+*UzimaAI* - Empowering health management through technology
+
