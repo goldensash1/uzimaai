@@ -72,4 +72,13 @@ PHP API
 - ESLint, PostCSS, Docker (optional for deployment)
 
 ---
----
+
+## 5. Quick Start
+
+### Clone the Repository
+
+bash
+git clone https://github.com/goldensash1/uzimaai.git
+cd uzimaai
+
+
