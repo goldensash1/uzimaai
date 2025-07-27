@@ -120,3 +120,46 @@ npx expo start
 
 ---
 
+## 6. Detailed Setup Instructions
+
+### Environment Setup
+
+- Install XAMPP and start Apache/MySQL
+- Install Node.js dependencies for all subprojects
+
+### Database Configuration
+
+- Create the database and import schema/data
+- Configure database connections in api/config/db.php and admin-dashboard/server/config/db.js
+
+### API Configuration
+
+- Update the mobile app API URL in uzimaai-app/constants/api.ts or use node update-ip.js
+
+### Start Services
+
+- Start backend, frontend, and mobile app as described above
+
+---
+
+## 7. Configuration
+
+### Environment Variables
+
+**Admin Dashboard Backend (.env):**
+
+NODE_ENV=development
+PORT=8000
+JWT_SECRET=your-secret-key
+DB_HOST=localhost
+DB_USER=root
+DB_PASSWORD=
+DB_NAME=uzimaaidb
+DB_PORT=3306
+CORS_ORIGIN=http://localhost:5173
+
+*Mobile App API Configuration:*
+Update uzimaai-app/constants/api.ts with your local IP address.
+
+---
+
