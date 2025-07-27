@@ -22,4 +22,10 @@ Empowering health management through technology.
 14. License
 15. Support
 
+## 1. Project Overview
+
+UzimaAI is a health-focused platform providing users with AI-powered medical information, medicine management, emergency contacts, and an admin dashboard for system management. The project aims to make health information and emergency support more accessible and manageable for both users and administrators.
+
+---
+
 ---
