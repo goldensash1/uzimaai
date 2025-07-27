@@ -53,4 +53,13 @@ PHP API
 - CORS support
 
 ---
+
+## 3. System Architecture
+
+- Mobile App: React Native (Expo)
+- API: PHP REST API
+- Admin Dashboard: React frontend + Node.js/Express backend
+- Database: MySQL/SQL
+
+---
 ---
