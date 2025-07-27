@@ -26,6 +26,24 @@ Empowering health management through technology.
 
 UzimaAI is a health-focused platform providing users with AI-powered medical information, medicine management, emergency contacts, and an admin dashboard for system management. The project aims to make health information and emergency support more accessible and manageable for both users and administrators.
 
+## 2. Features
+
+Admin Dashboard
+- User management (CRUD)
+- Medicine management (CRUD)
+- Review moderation
+- Search history analytics
+- Dashboard with charts/statistics
+- Secure admin authentication
+
+Mobile App
+- User registration/login/profile
+- Medicine search and reviews
+- AI health chatbot
+- Emergency contact management
+- First aid information
+- Search history
+
 ---
 
 ---
