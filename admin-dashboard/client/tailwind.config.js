@@ -32,7 +32,7 @@ export default {
           900: '#111827',
         }
       },
-      ontFamily: {
+      fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],
       },
     },
