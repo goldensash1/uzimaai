@@ -196,38 +196,6 @@ Update uzimaai-app/constants/api.ts with your local IP address.
 
 ---
 
-## 8. API Documentation
-
-*Authentication*
-- POST /api/endpoints/register.php - User registration
-- POST /api/endpoints/login.php - User login
-- GET /api/endpoints/profile.php - Get user profile
-- POST /api/endpoints/update_profile.php - Update profile
-- POST /api/endpoints/change_password.php - Change password
-
-*Medicines*
-- GET /api/endpoints/medicines.php - Get medicines list
-- POST /api/endpoints/add_medicine_review.php - Add review
-- GET /api/endpoints/get_medicine_reviews.php - Get reviews
-
-*AI Chat*
-- POST /api/endpoints/send_message.php - Send message
-- GET /api/endpoints/get_chat_history.php - Get chat history
-- POST /api/endpoints/ai_chat.php - AI chat processing
-- GET /api/endpoints/ai_status.php - Check AI status
-
-*Emergency & First Aid*
-- GET /api/endpoints/emergency_contacts.php - Get contacts
-- POST /api/endpoints/add_emergency_contact.php - Add contact
-- GET /api/endpoints/first_aid_practices.php - Get first aid procedures
-
-*Search & History*
-- GET /api/endpoints/get_search_history.php - Get search history
-
-*For detailed request/response examples, see [api/README.md](api/README.md).*
-
----
-
 ## 9. Development & Testing
 
 - See the "Development" and "Testing" sections in your current README for workflow and API testing examples.
