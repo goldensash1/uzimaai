@@ -46,36 +46,36 @@ export default function TabLayout() {
         tabBarActiveTintColor: '#377DFF',
         tabBarInactiveTintColor: '#A0AEC0',
         tabBarStyle: {
-          height: 80,
+          height: 90,
           borderTopLeftRadius: 24,
           borderTopRightRadius: 24,
           position: 'absolute',
-          left: 8,
-          right: 8,
-          bottom: 8,
-          elevation: 20,
-          backgroundColor: 'rgba(255, 255, 255, 0.95)',
-          shadowColor: '#377DFF',
-          shadowOffset: { width: 0, height: -4 },
+          left: 16,
+          right: 16,
+          bottom: 16,
+          elevation: 30,
+          backgroundColor: 'rgba(255, 255, 255, 0.98)',
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: -8 },
           shadowOpacity: 0.15,
-          shadowRadius: 12,
+          shadowRadius: 20,
           borderTopWidth: 0,
-          paddingTop: 8,
-          paddingBottom: 16,
-          paddingHorizontal: 8,
+          paddingTop: 16,
+          paddingBottom: 24,
+          paddingHorizontal: 16,
         },
         headerShown: false,
         tabBarShowLabel: true,
         tabBarLabelStyle: {
-          fontSize: 11,
-          fontWeight: '600',
-          marginTop: 4,
+          fontSize: 12,
+          fontWeight: '500',
+          marginTop: 6,
         },
         tabBarIconStyle: {
-          marginTop: 4,
+          marginTop: 6,
         },
         tabBarItemStyle: {
-          paddingVertical: 4,
+          paddingVertical: 6,
         },
       }}
     >
@@ -86,9 +86,9 @@ export default function TabLayout() {
           tabBarIcon: ({ color, focused }) => (
             <View style={[styles.iconContainer, focused && styles.iconContainerActive]}>
               <TabBarIonicIcon 
-                name="home" 
+                name="home-outline" 
                 size={focused ? 26 : 24} 
-                color={focused ? '#377DFF' : color} 
+                color={focused ? '#377DFF' : '#A0AEC0'} 
                 focused={focused}
               />
             </View>
@@ -96,15 +96,15 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="two"
+        name="symptoms"
         options={{
           title: 'Symptoms',
           tabBarIcon: ({ color, focused }) => (
             <View style={[styles.iconContainer, focused && styles.iconContainerActive]}>
-              <TabBarMaterialIcon 
-                name="sick" 
+              <TabBarIcon 
+                name="stethoscope" 
                 size={focused ? 26 : 24} 
-                color={focused ? '#377DFF' : color} 
+                color={focused ? '#377DFF' : '#A0AEC0'} 
                 focused={focused}
               />
             </View>
@@ -120,7 +120,7 @@ export default function TabLayout() {
               <TabBarIcon 
                 name="medkit" 
                 size={focused ? 26 : 24} 
-                color={focused ? '#377DFF' : color} 
+                color={focused ? '#377DFF' : '#A0AEC0'} 
                 focused={focused}
               />
             </View>
@@ -130,13 +130,31 @@ export default function TabLayout() {
       <Tabs.Screen
         name="chatbot"
         options={{
-          title: 'AI Chat',
+          title: '',
+          tabBarIcon: ({ color, focused }) => (
+            <View style={[styles.centralButton, focused && styles.centralButtonActive]}>
+              <View style={styles.centralButtonInner}>
+                <TabBarIonicIcon 
+                  name="chatbubble-ellipses" 
+                  size={28} 
+                  color="#fff" 
+                  focused={focused}
+                />
+              </View>
+            </View>
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="firstaid"
+        options={{
+          title: 'First Aid',
           tabBarIcon: ({ color, focused }) => (
             <View style={[styles.iconContainer, focused && styles.iconContainerActive]}>
-              <TabBarIonicIcon 
-                name="chatbubble-ellipses" 
-                size={focused ? 28 : 26} 
-                color={focused ? '#377DFF' : color} 
+              <TabBarMaterialIcon 
+                name="health-and-safety" 
+                size={focused ? 26 : 24} 
+                color={focused ? '#377DFF' : '#A0AEC0'} 
                 focused={focused}
               />
             </View>
@@ -152,29 +170,14 @@ export default function TabLayout() {
               <TabBarIonicIcon 
                 name="call" 
                 size={focused ? 26 : 24} 
-                color={focused ? '#377DFF' : color} 
+                color={focused ? '#377DFF' : '#A0AEC0'} 
                 focused={focused}
               />
             </View>
           ),
         }}
       />
-      <Tabs.Screen
-        name="firstaid"
-        options={{
-          title: 'First Aid',
-          tabBarIcon: ({ color, focused }) => (
-            <View style={[styles.iconContainer, focused && styles.iconContainerActive]}>
-              <TabBarMaterialIcon 
-                name="health-and-safety" 
-                size={focused ? 26 : 24} 
-                color={focused ? '#377DFF' : color} 
-                focused={focused}
-              />
-            </View>
-          ),
-        }}
-      />
+
       <Tabs.Screen
         name="profile"
         options={{
@@ -184,7 +187,7 @@ export default function TabLayout() {
               <TabBarIcon 
                 name="user" 
                 size={focused ? 26 : 24} 
-                color={focused ? '#377DFF' : color} 
+                color={focused ? '#377DFF' : '#A0AEC0'} 
                 focused={focused}
               />
             </View>
@@ -197,15 +200,43 @@ export default function TabLayout() {
 
 const styles = StyleSheet.create({
   iconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: 'transparent',
   },
   iconContainerActive: {
-    backgroundColor: 'rgba(55, 125, 255, 0.1)',
-    transform: [{ scale: 1.1 }],
+    backgroundColor: 'rgba(55, 125, 255, 0.08)',
+    transform: [{ scale: 1.05 }],
+  },
+  centralButton: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#377DFF',
+    shadowColor: '#377DFF',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.4,
+    shadowRadius: 12,
+    elevation: 12,
+    marginTop: -24,
+    borderWidth: 4,
+    borderColor: '#fff',
+  },
+  centralButtonActive: {
+    backgroundColor: '#2B6CD9',
+    transform: [{ scale: 1.05 }],
+  },
+  centralButtonInner: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'transparent',
   },
 });

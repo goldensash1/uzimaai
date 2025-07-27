@@ -14,6 +14,7 @@ export const API_ENDPOINTS = {
   login: `${API_BASE_URL}/login.php`,
   profile: `${API_BASE_URL}/profile.php`,
   updateProfile: `${API_BASE_URL}/update_profile.php`,
+  changePassword: `${API_BASE_URL}/change_password.php`,
   medicines: `${API_BASE_URL}/medicines.php`,
   addMedicineReview: `${API_BASE_URL}/add_medicine_review.php`,
   getMedicineReviews: `${API_BASE_URL}/get_medicine_reviews.php`,

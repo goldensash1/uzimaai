@@ -127,14 +127,26 @@ export default function FirstAidScreen() {
 
   return (
     <View style={styles.container}>
+      {/* Modern Header Section */}
       <View style={styles.header}>
-        <Text style={styles.title}>First Aid Guide</Text>
-        <Text style={styles.subtitle}>Emergency procedures and first aid practices</Text>
+        <View style={styles.headerContent}>
+          <View style={styles.iconContainer}>
+            <MaterialIcons name="health-and-safety" size={32} color="#377DFF" />
+          </View>
+          <View style={styles.headerText}>
+            <Text style={styles.title}>First Aid Guide</Text>
+            <Text style={styles.subtitle}>Emergency procedures and first aid practices</Text>
+          </View>
+        </View>
       </View>
 
+      {/* Emergency Call Button */}
       <TouchableOpacity style={styles.emergencyButton} onPress={handleEmergencyCall}>
-        <Ionicons name="call" size={24} color="#fff" />
+        <View style={styles.emergencyIcon}>
+          <Ionicons name="call" size={20} color="#fff" />
+        </View>
         <Text style={styles.emergencyButtonText}>EMERGENCY - Call 911</Text>
+        <Ionicons name="chevron-forward" size={16} color="#fff" />
       </TouchableOpacity>
 
       <TextInput
@@ -145,33 +157,36 @@ export default function FirstAidScreen() {
         onChangeText={setSearch}
       />
 
-      <ScrollView 
-        horizontal 
-        showsHorizontalScrollIndicator={false}
-        style={styles.categoryScroll}
-        contentContainerStyle={styles.categoryContainer}
-      >
-        {CATEGORIES.map(category => (
-          <TouchableOpacity
-            key={category}
-            style={[
-              styles.categoryChip,
-              selectedCategory === category && styles.categoryChipActive
-            ]}
-            onPress={() => {
-              setSelectedCategory(category);
-              fetchPractices();
-            }}
-          >
-            <Text style={[
-              styles.categoryChipText,
-              selectedCategory === category && styles.categoryChipTextActive
-            ]}>
-              {category}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
+      <View style={styles.categorySection}>
+        <Text style={styles.categoryTitle}>Quick Categories</Text>
+        <ScrollView 
+          horizontal 
+          showsHorizontalScrollIndicator={false}
+          style={styles.categoryScroll}
+          contentContainerStyle={styles.categoryContainer}
+        >
+          {CATEGORIES.map(category => (
+            <TouchableOpacity
+              key={category}
+              style={[
+                styles.categoryChip,
+                selectedCategory === category && styles.categoryChipActive
+              ]}
+              onPress={() => {
+                setSelectedCategory(category);
+                fetchPractices();
+              }}
+            >
+              <Text style={[
+                styles.categoryChipText,
+                selectedCategory === category && styles.categoryChipTextActive
+              ]}>
+                {category}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      </View>
 
       {loading ? (
         <View style={styles.centered}>
@@ -259,40 +274,75 @@ const styles = StyleSheet.create({
     paddingBottom: 100, // Add padding for tab bar
   },
   header: {
+    backgroundColor: '#fff',
+    paddingTop: 60,
+    paddingBottom: 24,
+    paddingHorizontal: 20,
+    borderBottomLeftRadius: 24,
+    borderBottomRightRadius: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 3,
     marginBottom: 20,
   },
+  headerContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  iconContainer: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: '#F0F4FF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 16,
+  },
+  headerText: {
+    flex: 1,
+  },
   title: {
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: 'bold',
-    color: '#232B38',
-    marginBottom: 8,
-    textAlign: 'center',
+    color: '#1A202C',
+    marginBottom: 4,
   },
   subtitle: {
-    fontSize: 16,
-    color: '#7B8CA6',
-    textAlign: 'center',
+    fontSize: 14,
+    color: '#718096',
   },
   emergencyButton: {
     backgroundColor: '#E53935',
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 12,
+    justifyContent: 'space-between',
+    paddingVertical: 16,
     paddingHorizontal: 20,
-    borderRadius: 12,
+    borderRadius: 16,
     marginBottom: 20,
+    marginHorizontal: 20,
     shadowColor: '#E53935',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 4,
   },
+  emergencyIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   emergencyButtonText: {
     color: '#fff',
     fontWeight: 'bold',
     fontSize: 16,
-    marginLeft: 8,
+    flex: 1,
+    textAlign: 'center',
   },
   search: {
     backgroundColor: '#F5F7FA',
@@ -304,6 +354,16 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#E2E8F0',
   },
+  categorySection: {
+    marginBottom: 20,
+  },
+  categoryTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#232B38',
+    marginBottom: 12,
+    paddingHorizontal: 4,
+  },
   categoryScroll: {
     marginBottom: 16,
   },
@@ -311,25 +371,36 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
   },
   categoryChip: {
-    backgroundColor: '#F5F7FA',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    marginHorizontal: 4,
-    borderWidth: 1,
+    backgroundColor: '#F8FAFC',
+    paddingHorizontal: 18,
+    paddingVertical: 10,
+    borderRadius: 24,
+    marginHorizontal: 6,
+    borderWidth: 1.5,
     borderColor: '#E2E8F0',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 4,
+    elevation: 2,
   },
   categoryChipActive: {
     backgroundColor: '#377DFF',
     borderColor: '#377DFF',
+    shadowColor: '#377DFF',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
   },
   categoryChipText: {
-    color: '#7B8CA6',
+    color: '#64748B',
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: '600',
   },
   categoryChipTextActive: {
     color: '#fff',
+    fontWeight: '700',
   },
   centered: {
     flex: 1,

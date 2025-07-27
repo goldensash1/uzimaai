@@ -29,9 +29,9 @@ export default function HomeScreen() {
       {/* Feature Cards */}
       <ScrollView contentContainerStyle={styles.cardsContainer} showsVerticalScrollIndicator={false}>
         <View style={styles.row}>
-          <Link href="/two" asChild>
+          <Link href="/symptoms" asChild>
             <FeatureCard
-              icon={<MaterialIcons name="sick" size={32} color="#377DFF" />}
+              icon={<MaterialIcons name="medical-services" size={32} color="#377DFF" />}
               iconBg="#E6F0FF"
               title="Symptom Checker"
               subtitle="Check your symptoms"
