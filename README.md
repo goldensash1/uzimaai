@@ -253,7 +253,7 @@ Update uzimaai-app/constants/api.ts with your local IP address.
 - Password: admin123
 
 *Sample User*
-- Email: john@example.com
+- Email: sash@example.com
 - Password: user123
 
 ---
