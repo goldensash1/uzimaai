@@ -97,5 +97,17 @@ mysql -u root -p < database/uzimaaidb\ \(4\).sql
 
 ### Start All Services
 
+*Admin Dashboard Backend*
+bash
+cd admin-dashboard/server
+npm install
+npm run dev
+
+
+*Admin Dashboard Frontend*
+bash
+cd admin-dashboard/client
+npm install
+npm run dev
 
 
