@@ -62,4 +62,14 @@ PHP API
 - Database: MySQL/SQL
 
 ---
+
+## 4. Technologies Used
+
+- React, Vite, Tailwind CSS (Admin Dashboard)
+- Node.js, Express, MySQL2, JWT (Admin Backend)
+- PHP, MySQLi/PDO (API)
+- React Native, Expo, Axios (Mobile App)
+- ESLint, PostCSS, Docker (optional for deployment)
+
+---
 ---
