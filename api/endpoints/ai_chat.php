@@ -107,7 +107,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $timestamp = date('Y-m-d H:i:s');
     
     // Save user message
-    $stmt = $conn->prepare("INSERT INTO userContext (userid, message, response, timestamp, type) VALUES (?, ?, ?, ?, ?)");
+    $stmt = $conn->prepare("INSERT INTO chatHistory (userid, message, response, timestamp, type) VALUES (?, ?, ?, ?, ?)");
     $stmt->bind_param("issss", $userid, $message, $ai_response, $timestamp, $message_type);
     
     if ($stmt->execute()) {

@@ -1,8 +1,19 @@
 <?php
+header('Content-Type: application/json');
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: GET, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type');
+
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    exit(0);
+}
+
 require_once '../config/db.php';
 require_once '../utils/response.php';
 
-$UserId = $_GET['UserId'] ?? null;
+// Handle both UserId and userid parameters
+$UserId = $_GET['UserId'] ?? $_GET['userid'] ?? null;
+
 if (!$UserId) {
     send_json(['error' => 'Missing UserId'], 400);
 }
@@ -12,7 +23,22 @@ $stmt->bind_param('i', $UserId);
 $stmt->execute();
 $result = $stmt->get_result();
 $contacts = [];
+
 while ($row = $result->fetch_assoc()) {
-    $contacts[] = $row;
+    // Transform the data to match the frontend expectations
+    $contacts[] = [
+        'contactId' => $row['contactId'],
+        'name' => $row['ContactName'],
+        'phone' => $row['PhoneNumber'],
+        'relationship' => $row['Relationship'],
+        'isPrimary' => $row['contactStatus'] == 2, // 2 means primary contact
+        'updatedDate' => $row['updatedDate']
+    ];
 }
-send_json(['success' => true, 'contacts' => $contacts]); 
+
+send_json([
+    'success' => true, 
+    'data' => $contacts,
+    'count' => count($contacts)
+]);
+?> 
