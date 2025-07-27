@@ -98,25 +98,25 @@ mysql -u root -p < database/uzimaaidb\ \(4\).sql
 ### Start All Services
 
 *Admin Dashboard Backend*
-bash
+```bash
 cd admin-dashboard/server
 npm install
 npm run dev
-
+```
 
 *Admin Dashboard Frontend*
-bash
+```bash
 cd admin-dashboard/client
 npm install
 npm run dev
-
+```
 
 *Mobile App*
-bash
+```bash
 cd uzimaai-app
 npm install
 npx expo start
-
+```
 
 ---
 
