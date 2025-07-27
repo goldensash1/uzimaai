@@ -81,6 +81,21 @@ PHP API
 
 bash
 git clone https://github.com/goldensash1/uzimaai.git
-cd uzimaai
+cd uzimaai 
+
+### Set Up XAMPP
+
+1. Download and install [XAMPP](https://www.apachefriends.org/)
+2. Start Apache and MySQL services
+3. Place the project in the htdocs folder
+
+### Database Setup
+
+bash
+mysql -u root -p < database/uzimaaidb\ \(4\).sql
+
+
+### Start All Services
+
 
 
