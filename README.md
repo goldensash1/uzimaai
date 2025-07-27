@@ -74,4 +74,93 @@ PHP API
 - ESLint, PostCSS, Docker (optional for deployment)
 
 ---
+
+## 5. Quick Start
+
+### Clone the Repository
+
+bash
+git clone https://github.com/goldensash1/uzimaai.git
+cd uzimaai 
+
+### Set Up XAMPP
+
+1. Download and install [XAMPP](https://www.apachefriends.org/)
+2. Start Apache and MySQL services
+3. Place the project in the htdocs folder
+
+### Database Setup
+
+bash
+mysql -u root -p < database/uzimaaidb\ \(4\).sql
+
+
+### Start All Services
+
+*Admin Dashboard Backend*
+```bash
+cd admin-dashboard/server
+npm install
+npm run dev
+```
+
+*Admin Dashboard Frontend*
+```bash
+cd admin-dashboard/client
+npm install
+npm run dev
+```
+
+*Mobile App*
+```bash
+cd uzimaai-app
+npm install
+npx expo start
+```
+
 ---
+
+## 6. Detailed Setup Instructions
+
+### Environment Setup
+
+- Install XAMPP and start Apache/MySQL
+- Install Node.js dependencies for all subprojects
+
+### Database Configuration
+
+- Create the database and import schema/data
+- Configure database connections in api/config/db.php and admin-dashboard/server/config/db.js
+
+### API Configuration
+
+- Update the mobile app API URL in uzimaai-app/constants/api.ts or use node update-ip.js
+
+### Start Services
+
+- Start backend, frontend, and mobile app as described above
+
+---
+
+## 7. Configuration
+
+### Environment Variables
+
+**Admin Dashboard Backend (.env):**
+```bash
+NODE_ENV=development
+PORT=8000
+JWT_SECRET=your-secret-key
+DB_HOST=localhost
+DB_USER=root
+DB_PASSWORD=
+DB_NAME=uzimaaidb
+DB_PORT=3306
+CORS_ORIGIN=http://localhost:5173
+```
+*Mobile App API Configuration:*
+```bash
+Update uzimaai-app/constants/api.ts with your local IP address.
+```
+---
+
