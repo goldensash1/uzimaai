@@ -1,12 +1,12 @@
 // IMPORTANT: Replace 'YOUR_LOCAL_IP' with your computer's local network IP address (e.g., 192.168.1.10)
-// Current IP: 192.168.8.108 (updated on 2025-07-27)
-export const API_BASE_URL = 'http://192.168.8.108/uzimaai/api/endpoints';
+// Current IP: localhost (updated on 2025-07-30)
+export const API_BASE_URL = 'http://localhost/uzimaai/api/endpoints';
 
 // Fallback URLs in case the primary IP doesn't work
 export const FALLBACK_URLS = [
-  'http://192.168.8.108/uzimaai/api/endpoints', // Current IP
-  'http://192.168.8.144/uzimaai/api/endpoints', // Previous IP
-  'http://localhost/uzimaai/api/endpoints',     // Localhost fallback
+  'http://localhost/uzimaai/api/endpoints',     // Localhost (working)
+  'http://172.17.224.138/uzimaai/api/endpoints', // Previous IP
+  'http://192.168.8.108/uzimaai/api/endpoints', // Previous IP
 ];
 
 export const API_ENDPOINTS = {
@@ -20,7 +20,7 @@ export const API_ENDPOINTS = {
   getMedicineReviews: `${API_BASE_URL}/get_medicine_reviews.php`,
   sendMessage: `${API_BASE_URL}/send_message.php`,
   getChatHistory: `${API_BASE_URL}/get_chat_history.php`,
-  aiChat: `${API_BASE_URL}/ai_chat.php`,
+  aiChat: `${API_BASE_URL}/ai_chat_enhanced.php`, // Enhanced AI with medicine recommendations
   aiStatus: `${API_BASE_URL}/ai_status.php`,
   getSearchHistory: `${API_BASE_URL}/get_search_history.php`,
   emergencyContacts: `${API_BASE_URL}/emergency_contacts.php`,

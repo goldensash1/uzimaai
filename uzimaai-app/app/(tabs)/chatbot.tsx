@@ -11,6 +11,9 @@ interface ChatMessage {
   sender: 'user' | 'bot';
   text: string;
   time: string;
+  medicineRecommendations?: any[];
+  diagnosticInfo?: any[];
+  aiSource?: string;
 }
 
 const INITIAL_MESSAGE: ChatMessage = {
@@ -114,7 +117,10 @@ export default function ChatbotScreen() {
           id: `bot-${Date.now()}`,
           sender: 'bot',
           text: response.response,
-          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          medicineRecommendations: response.medicine_recommendations || [],
+          diagnosticInfo: response.diagnostic_info || [],
+          aiSource: response.ai_source || 'unknown'
         };
 
         setMessages(prev => [...prev, botMessage]);
@@ -223,6 +229,52 @@ function ChatBubble({ message, onSpeak }: { message: ChatMessage, onSpeak: (text
       {!isUser && <Image source={require('../../assets/images/icon.png')} style={styles.avatarBotSmall} resizeMode="contain" />}
       <View style={[styles.bubble, isUser ? styles.bubbleUser : styles.bubbleBot]}>
         <Text style={[styles.bubbleText, isUser && { color: '#fff' }]}>{message.text}</Text>
+        
+        {/* Medicine Recommendations */}
+        {!isUser && message.medicineRecommendations && message.medicineRecommendations.length > 0 && (
+          <View style={styles.medicineContainer}>
+            <Text style={styles.medicineTitle}>💊 Medicine Recommendations:</Text>
+            {message.medicineRecommendations.map((rec, index) => (
+              <View key={index} style={styles.medicineCard}>
+                <Text style={styles.medicineCategory}>{rec.category}</Text>
+                {Object.entries(rec.medicines).map(([medicine, dosage]) => (
+                  <View key={medicine} style={styles.medicineItem}>
+                    <Text style={styles.medicineName}>• {medicine}</Text>
+                    <Text style={styles.medicineDosage}>{String(dosage)}</Text>
+                  </View>
+                ))}
+                {rec.notes && <Text style={styles.medicineNotes}>Note: {rec.notes}</Text>}
+              </View>
+            ))}
+          </View>
+        )}
+        
+        {/* Diagnostic Information */}
+        {!isUser && message.diagnosticInfo && message.diagnosticInfo.length > 0 && (
+          <View style={styles.diagnosticContainer}>
+            <Text style={styles.diagnosticTitle}>🔍 Possible Conditions:</Text>
+            {message.diagnosticInfo.map((diag, index) => (
+              <View key={index} style={styles.diagnosticCard}>
+                <Text style={styles.diagnosticCondition}>{diag.condition}</Text>
+                {diag.common_causes && (
+                  <View style={styles.diagnosticSection}>
+                    <Text style={styles.diagnosticSubtitle}>Common Causes:</Text>
+                    {diag.common_causes.map((cause: string, idx: number) => (
+                      <Text key={idx} style={styles.diagnosticItem}>• {cause}</Text>
+                    ))}
+                  </View>
+                )}
+                {diag.when_to_seek_care && (
+                  <View style={styles.diagnosticSection}>
+                    <Text style={styles.diagnosticSubtitle}>When to Seek Care:</Text>
+                    <Text style={styles.diagnosticItem}>{diag.when_to_seek_care}</Text>
+                  </View>
+                )}
+              </View>
+            ))}
+          </View>
+        )}
+        
         <View style={styles.bubbleFooter}>
           <Text style={[styles.bubbleTime, isUser && { color: '#E2E8F0' }]}>{message.time}</Text>
           {!isUser && (
@@ -368,6 +420,94 @@ const styles = StyleSheet.create({
     color: '#B7791F',
     fontSize: 14,
     textAlign: 'center',
+  },
+  // Medicine recommendation styles
+  medicineContainer: {
+    marginTop: 12,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: '#E2E8F0',
+  },
+  medicineTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#2D3748',
+    marginBottom: 8,
+  },
+  medicineCard: {
+    backgroundColor: '#F7FAFC',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 8,
+    borderLeftWidth: 3,
+    borderLeftColor: '#377DFF',
+  },
+  medicineCategory: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#377DFF',
+    marginBottom: 6,
+  },
+  medicineItem: {
+    marginBottom: 4,
+  },
+  medicineName: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: '#2D3748',
+  },
+  medicineDosage: {
+    fontSize: 12,
+    color: '#718096',
+    marginLeft: 8,
+    fontStyle: 'italic',
+  },
+  medicineNotes: {
+    fontSize: 12,
+    color: '#E53E3E',
+    marginTop: 6,
+    fontStyle: 'italic',
+  },
+  // Diagnostic information styles
+  diagnosticContainer: {
+    marginTop: 12,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: '#E2E8F0',
+  },
+  diagnosticTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#2D3748',
+    marginBottom: 8,
+  },
+  diagnosticCard: {
+    backgroundColor: '#F0FFF4',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 8,
+    borderLeftWidth: 3,
+    borderLeftColor: '#38A169',
+  },
+  diagnosticCondition: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#38A169',
+    marginBottom: 6,
+  },
+  diagnosticSection: {
+    marginBottom: 6,
+  },
+  diagnosticSubtitle: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: '#2D3748',
+    marginBottom: 2,
+  },
+  diagnosticItem: {
+    fontSize: 12,
+    color: '#4A5568',
+    marginLeft: 8,
   },
   inputContainer: {
     backgroundColor: '#fff',

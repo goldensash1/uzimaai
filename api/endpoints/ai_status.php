@@ -10,9 +10,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 require_once '../config/db.php';
 require_once '../utils/response.php';
+require_once '../config/ai_config.php';
 
-// Configuration
-$groq_api_key = "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";
+// Get API key from configuration
+$groq_api_key = getApiKey('groq');
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $status = [
@@ -30,16 +31,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     }
     
     // Check API key
-    if (!empty($groq_api_key)) {
+    if (isApiKeyValid($groq_api_key)) {
         $status['api_key'] = 'configured';
     } else {
-        $status['api_key'] = 'missing';
+        $status['api_key'] = 'invalid_or_missing';
     }
     
     // Test AI service with a simple request
     try {
         $test_data = [
-            "model" => "llama-3.1-8b-instant",
+            "model" => $DEFAULT_MODEL,
             "messages" => [
                 [
                     "role" => "user",

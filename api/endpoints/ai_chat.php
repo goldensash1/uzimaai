@@ -10,9 +10,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 require_once '../config/db.php';
 require_once '../utils/response.php';
+require_once '../config/ai_config.php';
 
-// Configuration
-$groq_api_key = "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";
+// Get API key from configuration
+$groq_api_key = getApiKey('groq');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Get input data
@@ -34,6 +35,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (!isset($input_data['userid']) || empty($input_data['userid'])) {
         send_json(['error' => 'User ID is required'], 400);
+        exit;
+    }
+
+    // Check if API key is valid
+    if (!isApiKeyValid($groq_api_key)) {
+        send_json(['error' => $ERROR_MESSAGES['invalid_api_key']], 503);
         exit;
     }
 
@@ -64,11 +71,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     ];
 
     $request_data = [
-        "model" => "llama-3.1-8b-instant",
+        "model" => $DEFAULT_MODEL,
         "messages" => $messages,
-        "temperature" => 0.7,
-        "max_tokens" => 150, // Limit tokens for concise responses
-        "top_p" => 1,
+        "temperature" => $TEMPERATURE,
+        "max_tokens" => $MAX_TOKENS,
+        "top_p" => $TOP_P,
         "stream" => false
     ];
 
@@ -97,7 +104,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Process response
     $response_data = json_decode($response, true);
     if ($http_status != 200 || !isset($response_data['choices'][0]['message']['content'])) {
-        send_json(['error' => 'API error', 'details' => $response_data], $http_status ?: 500);
+        $error_message = $ERROR_MESSAGES['service_unavailable'];
+        if (isset($response_data['error']['code']) && $response_data['error']['code'] === 'invalid_api_key') {
+            $error_message = $ERROR_MESSAGES['invalid_api_key'];
+        }
+        send_json(['error' => $error_message], $http_status ?: 500);
         exit;
     }
 
