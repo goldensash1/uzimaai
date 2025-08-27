@@ -1,145 +1,153 @@
+# UzimaAI
 
-## 🚀 Quick Start Guide
+Empowering health management through technology.
 
-### 1. Clone the Repository
-```bash
-git clone <repository-url>
-cd uzimaai
-```
+## our demo video link  to show the overview of how our app is its feature and  interface 
+ https://youtu.be/4HhHlZLZ_GE
+---
 
-### 2. Set Up XAMPP
+## Table of Contents
+
+1. Project Overview
+2. Features
+3. System Architecture
+4. Technologies Used
+5. Quick Start
+6. Detailed Setup Instructions
+7. Configuration
+8. API Documentation
+9. Development & Testing
+10. Deployment
+11. Default Credentials
+12. Troubleshooting
+13. Contributing
+14. License
+15. Support
+
+## 1. Project Overview
+
+UzimaAI is a health-focused platform providing users with AI-powered medical information, medicine management, emergency contacts, and an admin dashboard for system management. The project aims to make health information and emergency support more accessible and manageable for both users and administrators.
+
+## 2. Features
+
+Admin Dashboard
+- User management (CRUD)
+- Medicine management (CRUD)
+- Review moderation
+- Search history analytics
+- Dashboard with charts/statistics
+- Secure admin authentication
+
+Mobile App
+- User registration/login/profile
+- Medicine search and reviews
+- AI health chatbot
+- Emergency contact management
+- First aid information
+- Search history
+
+---
+
+PHP API
+- RESTful endpoints for all features
+- JWT-based authentication
+- Input validation and error handling
+- CORS support
+
+---
+
+## 3. System Architecture
+
+- Mobile App: React Native (Expo)
+- API: PHP REST API
+- Admin Dashboard: React frontend + Node.js/Express backend
+- Database: MySQL/SQL
+
+---
+
+## 4. Technologies Used
+
+- React, Vite, Tailwind CSS (Admin Dashboard)
+- Node.js, Express, MySQL2, JWT (Admin Backend)
+- PHP, MySQLi/PDO (API)
+- React Native, Expo, Axios (Mobile App)
+- ESLint, PostCSS, Docker (optional for deployment)
+
+---
+
+## 5. Quick Start
+
+### Clone the Repository
+
+bash
+git clone https://github.com/goldensash1/uzimaai.git
+cd uzimaai 
+
+### Set Up XAMPP
+
 1. Download and install [XAMPP](https://www.apachefriends.org/)
 2. Start Apache and MySQL services
-3. Place the project in `htdocs` folder
+3. Place the project in the htdocs folder
 
-### 3. Database Setup
-```bash
-# Import the database
+### Database Setup
+
+bash
 mysql -u root -p < database/uzimaaidb\ \(4\).sql
-```
 
-### 4. Start All Services
 
-#### Admin Dashboard
+### Start All Services
+
+*Admin Dashboard Backend*
 ```bash
-# Backend
 cd admin-dashboard/server
 npm install
 npm run dev
+```
 
-# Frontend (new terminal)
+*Admin Dashboard Frontend*
+```bash
 cd admin-dashboard/client
 npm install
 npm run dev
 ```
 
-#### Mobile App
+*Mobile App*
 ```bash
 cd uzimaai-app
 npm install
 npx expo start
 ```
 
-## 📖 Detailed Setup Instructions
+---
 
-### Step 1: Environment Setup
+## 6. Detailed Setup Instructions
 
-#### Install XAMPP
-1. Download XAMPP from [apachefriends.org](https://www.apachefriends.org/)
-2. Install and start Apache and MySQL
-3. Verify services are running at `http://localhost`
+### Environment Setup
 
-#### Install Node.js Dependencies
-```bash
-# Admin Dashboard Backend
-cd admin-dashboard/server
-npm install
+- Install XAMPP and start Apache/MySQL
+- Install Node.js dependencies for all subprojects
 
-# Admin Dashboard Frontend
-cd admin-dashboard/client
-npm install
+### Database Configuration
 
-# Mobile App
-cd uzimaai-app
-npm install
-```
+- Create the database and import schema/data
+- Configure database connections in api/config/db.php and admin-dashboard/server/config/db.js
 
-### Step 2: Database Configuration
+### API Configuration
 
-#### Create Database
-```bash
-# Access MySQL
-mysql -u root -p
+- Update the mobile app API URL in uzimaai-app/constants/api.ts or use node update-ip.js
 
-# Create database
-CREATE DATABASE IF NOT EXISTS uzimaaidb CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+### Start Services
 
-# Import schema and data
-mysql -u root -p uzimaaidb < database/uzimaaidb\ \(4\).sql
-```
+- Start backend, frontend, and mobile app as described above
 
-#### Configure Database Connections
+---
 
-**PHP API** (`api/config/db.php`):
-```php
-$host = 'localhost';
-$db   = 'uzimaaidb';
-$user = 'root';
-$pass = '';
-```
-
-**Admin Dashboard** (`admin-dashboard/server/config/db.js`):
-```javascript
-const dbConfig = {
-  host: process.env.DB_HOST || 'localhost',
-  user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || '',
-  database: process.env.DB_NAME || 'uzimaaidb',
-  port: process.env.DB_PORT || 3306
-};
-```
-
-### Step 3: API Configuration
-
-#### Update Mobile App API URL
-```bash
-cd uzimaai-app
-node update-ip.js
-```
-
-Or manually update `uzimaai-app/constants/api.ts`:
-```typescript
-export const API_BASE_URL = 'http://YOUR_IP_ADDRESS/uzimaai/api/endpoints';
-```
-
-### Step 4: Start Services
-
-#### Admin Dashboard
-```bash
-# Terminal 1: Backend
-cd admin-dashboard/server
-npm run dev
-# Runs on http://localhost:8000
-
-# Terminal 2: Frontend
-cd admin-dashboard/client
-npm run dev
-# Runs on http://localhost:5173
-```
-
-#### Mobile App
-```bash
-cd uzimaai-app
-npx expo start
-# Opens Expo DevTools in browser
-```
-
-## ⚙️ Configuration
+## 7. Configuration
 
 ### Environment Variables
 
-#### Admin Dashboard Backend (`.env`)
-```env
+**Admin Dashboard Backend (.env):**
+```bash
 NODE_ENV=development
 PORT=8000
 JWT_SECRET=your-secret-key
@@ -150,249 +158,85 @@ DB_NAME=uzimaaidb
 DB_PORT=3306
 CORS_ORIGIN=http://localhost:5173
 ```
-
-#### Mobile App API Configuration
-Update `uzimaai-app/constants/api.ts` with your local IP address:
-```typescript
-export const API_BASE_URL = 'http://192.168.1.100/uzimaai/api/endpoints';
-```
-
-### IP Address Management
-
-The mobile app needs to connect to your local server. Use the provided script:
+*Mobile App API Configuration:*
 ```bash
-cd uzimaai-app
-node update-ip.js
+Update uzimaai-app/constants/api.ts with your local IP address.
 ```
+---
 
-This automatically detects and updates your IP address in the API configuration.
+## 8. API Documentation
 
-## 🎨 Features
+*Authentication*
+- POST /api/endpoints/register.php - User registration
+- POST /api/endpoints/login.php - User login
+- GET /api/endpoints/profile.php - Get user profile
+- POST /api/endpoints/update_profile.php - Update profile
+- POST /api/endpoints/change_password.php - Change password
 
-### Admin Dashboard
-- **User Management**: View, add, edit, and delete users
-- **Medicine Management**: Manage medicine database with details
-- **Review Management**: Moderate user reviews and ratings
-- **Search History**: Track user search queries
-- **Analytics**: Dashboard with charts and statistics
-- **Authentication**: Secure admin login with JWT
+*Medicines*
+- GET /api/endpoints/medicines.php - Get medicines list
+- POST /api/endpoints/add_medicine_review.php - Add review
+- GET /api/endpoints/get_medicine_reviews.php - Get reviews
 
-### Mobile App
-- **User Authentication**: Register, login, profile management
-- **Medicine Search**: Search and view medicine information
-- **Reviews & Ratings**: Rate and review medicines
-- **AI Chatbot**: Health-related AI assistance
-- **Emergency Contacts**: Manage emergency contact list
-- **First Aid**: Comprehensive first aid procedures database
-- **Search History**: Track user search activity
+*AI Chat*
+- POST /api/endpoints/send_message.php - Send message
+- GET /api/endpoints/get_chat_history.php - Get chat history
+- POST /api/endpoints/ai_chat.php - AI chat processing
+- GET /api/endpoints/ai_status.php - Check AI status
 
-### PHP API
-- **RESTful Endpoints**: Complete CRUD operations
-- **Authentication**: JWT-based user authentication
-- **Data Validation**: Input sanitization and validation
-- **Error Handling**: Comprehensive error responses
-- **CORS Support**: Cross-origin resource sharing
+*Emergency & First Aid*
+- GET /api/endpoints/emergency_contacts.php - Get contacts
+- POST /api/endpoints/add_emergency_contact.php - Add contact
+- GET /api/endpoints/first_aid_practices.php - Get first aid procedures
 
-## 📚 API Documentation
+*Search & History*
+- GET /api/endpoints/get_search_history.php - Get search history
 
-### Authentication Endpoints
-- `POST /api/endpoints/register.php` - User registration
-- `POST /api/endpoints/login.php` - User login
-- `GET /api/endpoints/profile.php` - Get user profile
-- `POST /api/endpoints/update_profile.php` - Update profile
-- `POST /api/endpoints/change_password.php` - Change password
+*For detailed request/response examples, see [api/README.md](api/README.md).*
 
-### Medicine Endpoints
-- `GET /api/endpoints/medicines.php` - Get medicines list
-- `POST /api/endpoints/add_medicine_review.php` - Add review
-- `GET /api/endpoints/get_medicine_reviews.php` - Get reviews
+---
 
-### AI Chat Endpoints
-- `POST /api/endpoints/send_message.php` - Send message
-- `GET /api/endpoints/get_chat_history.php` - Get chat history
-- `POST /api/endpoints/ai_chat.php` - AI chat processing
-- `GET /api/endpoints/ai_status.php` - Check AI status
+## 9. Development & Testing
 
-### Emergency & First Aid
-- `GET /api/endpoints/emergency_contacts.php` - Get contacts
-- `POST /api/endpoints/add_emergency_contact.php` - Add contact
-- `GET /api/endpoints/first_aid_practices.php` - Get first aid procedures
+- See the "Development" and "Testing" sections in your current README for workflow and API testing examples.
+- Use Expo Go for mobile app testing.
+- Use Postman or curl for API testing.
 
-### Search & History
-- `GET /api/endpoints/get_search_history.php` - Get search history
+---
 
-## 🔧 Troubleshooting
+## 10. Deployment
 
-### Common Issues
+- Build frontend: npm run build in admin-dashboard/client
+- Set production environment and start backend: NODE_ENV=production npm start in admin-dashboard/server
+- Deploy PHP API to a web server (Apache/Nginx)
+- Build mobile app for production with Expo
 
-#### 1. Database Connection Failed
-```bash
-# Check MySQL service
-sudo service mysql status
+---
 
-# Verify database exists
-mysql -u root -p -e "SHOW DATABASES;"
+## 11. Default Credentials
 
-# Check credentials in config files
-```
+*Admin Dashboard*
+- Username: admin
+- Email: admin@uzimaai.com
+- Password: admin123
 
-#### 2. Mobile App Can't Connect to API
-```bash
-# Update IP address
-cd uzimaai-app
-node update-ip.js
+*Sample User*
+- Email: sash@example.com
+- Password: user123
 
-# Check XAMPP is running
-# Verify Apache and MySQL services
+---
 
-# Test API endpoint
-curl http://YOUR_IP/uzimaai/api/endpoints/login.php
-```
+## 12. Troubleshooting
 
-#### 3. Admin Dashboard Won't Start
-```bash
-# Check Node.js version
-node --version
+- Database connection issues: Check MySQL service and credentials
+- Mobile app API connection: Update IP, check XAMPP, test endpoints
+- Admin dashboard issues: Check Node.js version, clear npm cache, reinstall dependencies
+- Expo issues: Clear Expo cache, reset Metro bundler
+- Network: Allow necessary ports, ensure devices are on the same network
 
-# Clear npm cache
-npm cache clean --force
+---
 
-# Reinstall dependencies
-rm -rf node_modules package-lock.json
-npm install
-```
-
-#### 4. Expo Development Issues
-```bash
-# Clear Expo cache
-npx expo start --clear
-
-# Reset Metro bundler
-npx expo start --reset-cache
-```
-
-### Network Configuration
-
-#### Firewall Settings
-- Allow port 80 (Apache)
-- Allow port 3306 (MySQL)
-- Allow port 8000 (Admin Backend)
-- Allow port 5173 (Admin Frontend)
-
-#### Router Configuration
-- Ensure devices are on same network
-- Check router firewall settings
-- Verify port forwarding if needed
-
-## 🛠️ Development
-
-### Code Structure
-
-#### Admin Dashboard
-- **Frontend**: React with Vite, Tailwind CSS
-- **Backend**: Node.js with Express, MySQL
-- **Authentication**: JWT tokens
-- **State Management**: React Context
-
-#### Mobile App
-- **Framework**: React Native with Expo
-- **Navigation**: Expo Router
-- **Styling**: StyleSheet with consistent design
-- **API Integration**: Custom fetch wrapper
-
-#### PHP API
-- **Architecture**: RESTful API
-- **Database**: MySQL with prepared statements
-- **Security**: Input validation, CORS headers
-- **Error Handling**: Standardized error responses
-
-### Development Workflow
-
-1. **Database Changes**: Update schema in `database/` folder
-2. **API Development**: Add endpoints in `api/endpoints/`
-3. **Frontend Updates**: Modify React components
-4. **Mobile Features**: Update Expo app screens
-5. **Testing**: Test all components together
-
-### Testing
-
-#### API Testing
-```bash
-# Test PHP endpoints
-curl -X POST http://localhost/uzimaai/api/endpoints/login.php \
-  -H "Content-Type: application/json" \
-  -d '{"email":"test@example.com","password":"password"}'
-
-# Test Node.js endpoints
-curl -X GET http://localhost:8000/api/users \
-  -H "Authorization: Bearer YOUR_JWT_TOKEN"
-```
-
-#### Mobile App Testing
-- Use Expo Go app on physical device
-- Test on both iOS and Android
-- Verify network connectivity
-- Test all user flows
-
-## 🚀 Deployment
-
-### Production Setup
-
-#### Admin Dashboard
-```bash
-# Build frontend
-cd admin-dashboard/client
-npm run build
-
-# Set production environment
-cd admin-dashboard/server
-NODE_ENV=production npm start
-```
-
-#### PHP API
-- Deploy to web server (Apache/Nginx)
-- Configure SSL certificates
-- Set up proper database credentials
-- Enable error logging
-
-#### Mobile App
-```bash
-# Build for production
-cd uzimaai-app
-npx expo build:android
-npx expo build:ios
-```
-
-### Environment Variables (Production)
-```env
-NODE_ENV=production
-JWT_SECRET=your-very-secure-production-secret
-DB_HOST=your-production-db-host
-DB_USER=your-production-db-user
-DB_PASSWORD=your-production-db-password
-CORS_ORIGIN=https://yourdomain.com
-```
-
-### Security Considerations
-- Use strong JWT secrets
-- Enable HTTPS
-- Implement rate limiting
-- Regular security updates
-- Database backup strategy
-- Input validation and sanitization
-
-## 📝 Default Credentials
-
-### Admin Dashboard
-- **Username**: `admin`
-- **Email**: `admin@uzimaai.com`
-- **Password**: `admin123`
-
-### Sample User
-- **Email**: `john@example.com`
-- **Password**: `user123`
-
-## 🤝 Contributing
+## 13. Contributing
 
 1. Fork the repository
 2. Create a feature branch
@@ -400,11 +244,15 @@ CORS_ORIGIN=https://yourdomain.com
 4. Test thoroughly
 5. Submit a pull request
 
-## 📄 License
+---
+
+## 14. License
 
 This project is licensed under the MIT License.
 
-## 🆘 Support
+---
+
+## 15. Support
 
 For issues and questions:
 1. Check the troubleshooting section
@@ -414,4 +262,5 @@ For issues and questions:
 
 ---
 
-**UzimaAI** - Empowering health management through technology
+*UzimaAI* - Empowering health management through technology
+
